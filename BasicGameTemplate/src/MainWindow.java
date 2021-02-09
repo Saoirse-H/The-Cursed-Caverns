@@ -48,10 +48,11 @@ SOFTWARE.
 public class MainWindow {
 	private static JFrame frame = new JFrame("Game");   // Change to the name of your game 
 	private static Model gameworld= new Model();
-	private static Viewer canvas = new  Viewer( gameworld);
-	private KeyListener Controller =new Controller()  ; 
+	private static Viewer canvas = new Viewer(gameworld);
+	private KeyListener Controller =new Controller(); 
 	private static int TargetFPS = 100;
 	private static boolean startGame= false; 
+	private static boolean inBeginning = false;
 	private JLabel BackgroundImageForStartMenu ;
 	  
 	public MainWindow() {
@@ -74,6 +75,7 @@ public class MainWindow {
 				canvas.addKeyListener(Controller);    //adding the controller to the Canvas  
 	            canvas.requestFocusInWindow();   // making sure that the Canvas is in focus so keyboard input will be taking in .
 				startGame=true;
+				inBeginning = true;
 			}
 	    });  
 	    startMenuButton.setBounds(400, 500, 200, 40); 
@@ -104,6 +106,20 @@ public class MainWindow {
 			
 			//wait till next time step 
 			while (FrameCheck > System.currentTimeMillis()){ } 
+			
+			if(inBeginning) {
+				/* 1. Pop up
+				 * 2. Choose character
+				 * 3. Send info to model to assign sprite
+				 * 4. Set inBeginning to false
+				 */
+				Object[] characters = {"Witch", "Archer", "Soldier", "Brawler"};
+				ImageIcon icon = new ImageIcon("res/hooded-figure.png");
+				int chosenCharacter = JOptionPane.showOptionDialog(frame, "Please choose a player:", "Who are you?", JOptionPane.DEFAULT_OPTION, 
+																   JOptionPane.PLAIN_MESSAGE, icon, characters, characters[0]);
+				gameworld.selectPlayer(chosenCharacter);
+				inBeginning = false;
+			}
 			
 			if(startGame) {
 				gameloop();

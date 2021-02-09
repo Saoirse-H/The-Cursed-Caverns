@@ -160,6 +160,21 @@ public class Model {
 	private void CreateBullet() {
 		BulletList.add(new GameObject("res/Bullet.png",32,64,new Point3f(Player.getCentre().getX(),Player.getCentre().getY(),0.0f), 's'));	
 	}
+	
+	public void selectPlayer(int chosen) {
+		if(chosen == 0) {
+			Player.setTexture("res/Player/wizard.png");
+		}
+		else if(chosen == 1) {
+			Player.setTexture("res/Player/archer.png");
+		}
+		else if(chosen == 2) {
+			Player.setTexture("res/Player/soldier.png");
+		}
+		else if(chosen == 3) {
+			Player.setTexture("res/Player/brawler.png");
+		}
+	}
 
 	public GameObject getPlayer() {
 		return Player;
