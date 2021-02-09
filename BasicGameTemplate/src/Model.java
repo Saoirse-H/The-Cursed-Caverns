@@ -34,7 +34,7 @@ public class Model {
 	private Controller controller = Controller.getInstance();
 	private CopyOnWriteArrayList<GameObject> EnemiesList = new CopyOnWriteArrayList<GameObject>();
 	private CopyOnWriteArrayList<GameObject> BulletList = new CopyOnWriteArrayList<GameObject>();
-	private int Score = 0; 
+	private int health = 10; 
 
 	public Model() {
 		//setup game world 
@@ -67,11 +67,10 @@ public class Model {
 		// using enhanced for-loop style as it makes it alot easier both code wise and reading wise too 
 		for (GameObject temp : EnemiesList) {
 			for (GameObject Bullet : BulletList) {
-				if ( Math.abs(temp.getCentre().getX()- Bullet.getCentre().getX())< temp.getWidth() 
-				&& Math.abs(temp.getCentre().getY()- Bullet.getCentre().getY()) < temp.getHeight()) {
+				if (Math.abs(temp.getCentre().getX() - Bullet.getCentre().getX()) < temp.getWidth() 
+					&& Math.abs(temp.getCentre().getY()- Bullet.getCentre().getY()) < temp.getHeight()) {
 					EnemiesList.remove(temp);
 					BulletList.remove(Bullet);
-					Score++;
 				}
 			}
 		}		
@@ -81,14 +80,29 @@ public class Model {
 		// TODO Auto-generated method stub
 		for (GameObject temp : EnemiesList) {
 		    // Move enemies 
-			temp.getCentre().ApplyVector(new Vector3f(0,-1,0));
+			if(temp.getCentre().getX() > Player.getCentre().getX()) {
+				temp.getCentre().ApplyVector(new Vector3f(-1, 0, 0));
+			}
+			else if(temp.getCentre().getX() < Player.getCentre().getX()) {
+				temp.getCentre().ApplyVector(new Vector3f(1, 0, 0));
+			}
+			
+			if(temp.getCentre().getY() > Player.getCentre().getY()) {
+				temp.getCentre().ApplyVector(new Vector3f(0, 1, 0));
+			}
+			else if(temp.getCentre().getY() < Player.getCentre().getY()) {
+				temp.getCentre().ApplyVector(new Vector3f(0, -1, 0));
+			}
 						 
-			//see if they get to the top of the screen (remember 0 is the top)
-			// current boundary need to pass value to model 
-			if (temp.getCentre().getY()==900.0f) {
+			//see if they collide with the player
+			if (Math.abs(temp.getCentre().getX() - Player.getCentre().getX()) < temp.getWidth() 
+				&& Math.abs(temp.getCentre().getY()- Player.getCentre().getY()) < temp.getHeight()) {
+					health--;
+					temp.getCentre().ApplyVector(new Vector3f(0, 20, 0));
+				}
+			
+			if (temp.getCentre().getY() == 900.0f) {
 				EnemiesList.remove(temp);
-				// enemies win so score decreased 
-				Score--;
 			}
 		}
 		
@@ -188,8 +202,8 @@ public class Model {
 		return BulletList;
 	}
 
-	public int getScore() { 
-		return Score;
+	public int getHealth() { 
+		return health;
 	}
 }
 

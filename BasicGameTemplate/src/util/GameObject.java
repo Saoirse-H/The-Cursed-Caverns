@@ -32,10 +32,11 @@ public class GameObject {
 	private String textureLocation; 
 	private String blanktexture = "res/blankSprite.png";
 	private char direction;
+	private boolean beenHit = false;
 	
 	public GameObject() { }
 	
-    public GameObject(String textureLocation,int width,int height,Point3f centre, char direction) { 
+    public GameObject(String textureLocation, int width, int height, Point3f centre, char direction) { 
     	 hasTextured = true;
     	 this.textureLocation = textureLocation;
     	 this.width = width;
@@ -79,6 +80,14 @@ public class GameObject {
 	
 	public void setDirection(char direction) {
 		this.direction = direction;
+	}
+	
+	public boolean getBeenHit() {
+		return beenHit;
+	}
+	
+	public void setBeenHit(boolean beenHit) {
+		this.beenHit = beenHit;
 	}
 }
 

@@ -78,7 +78,7 @@ public class MainWindow {
 				inBeginning = true;
 			}
 	    });  
-	    startMenuButton.setBounds(400, 500, 200, 40); 
+	    startMenuButton.setBounds(367, 693, 266, 55); 
 	        
         //loading background image 
         File BackroundToLoad = new File("res/startscreen.png");  //should work okay on OSX and Linux but check if you have issues depending your eclipse install or if your running this without an IDE 
@@ -125,6 +125,10 @@ public class MainWindow {
 				gameloop();
 			}
 			
+			if(gameworld.getHealth() == 0) {
+				System.out.println("Game over");
+			}
+			
 			//UNIT test to see if framerate matches 
 			UnitTests.CheckFrameRate(System.currentTimeMillis(),FrameCheck, TargetFPS);   
 		}
@@ -145,7 +149,7 @@ public class MainWindow {
 		
 		// Both these calls could be setup as  a thread but we want to simplify the game logic for you.  
 		//score update  
-		frame.setTitle("Score =  "+ gameworld.getScore()); 	 
+		frame.setTitle("HP =  "+ gameworld.getHealth()); 	 
 	}
 
 }
