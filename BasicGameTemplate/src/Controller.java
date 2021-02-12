@@ -53,7 +53,7 @@ public class Controller implements KeyListener {
 		switch (e.getKeyChar()) {
 			case 'a':
 				setKeyAPressed(true);
-				break;  
+				break; 
 			case 's':
 				setKeySPressed(true);
 				break;

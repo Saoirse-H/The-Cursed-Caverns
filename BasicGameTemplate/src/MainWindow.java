@@ -113,7 +113,7 @@ public class MainWindow {
 				 * 3. Send info to model to assign sprite
 				 * 4. Set inBeginning to false
 				 */
-				Object[] characters = {"Witch", "Archer", "Soldier", "Brawler"};
+				Object[] characters = {"Archer", "Witch", "Brawler"};
 				ImageIcon icon = new ImageIcon("res/hooded-figure.png");
 				int chosenCharacter = JOptionPane.showOptionDialog(frame, "Please choose a player:", "Who are you?", JOptionPane.DEFAULT_OPTION, 
 																   JOptionPane.PLAIN_MESSAGE, icon, characters, characters[0]);

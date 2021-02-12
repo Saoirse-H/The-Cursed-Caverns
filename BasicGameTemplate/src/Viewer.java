@@ -6,6 +6,8 @@ import java.awt.LayoutManager;
 import java.awt.Rectangle;
 import java.awt.TexturePaint;
 import java.awt.image.BufferedImage;
+import java.awt.RenderingHints;
+import java.awt.geom.AffineTransform;
 import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
@@ -84,35 +86,47 @@ public class Viewer extends JPanel {
 		int width = (int) gameworld.getPlayer().getWidth();
 		int height = (int) gameworld.getPlayer().getHeight();
 		String texture = gameworld.getPlayer().getTexture();
-		char direction = gameworld.getPlayer().getDirection();
-		
+		char playerDirection = gameworld.getPlayer().getDirection();
 		//Draw background 
 		drawBackground(g);
 		
 		//Draw player
-		drawPlayer(x, y, width, height, texture, direction,g);
+		drawPlayer(x, y, width, height, texture, playerDirection,g);
 		  
 		//Draw Bullets 
 		// change back 
 		gameworld.getBullets().forEach((temp) -> { 
-			drawBullet((int) temp.getCentre().getX(), (int) temp.getCentre().getY(), (int) temp.getWidth(), (int) temp.getHeight(), temp.getTexture(),g);	 
+			drawBullet((int) temp.getCentre().getX(), (int) temp.getCentre().getY(), (int) temp.getWidth(), (int) temp.getHeight(), temp.getTexture(), temp.getDirection(), g);	 
 		}); 
 		
 		//Draw Enemies   
 		gameworld.getEnemies().forEach((temp) -> {
-			drawEnemies((int) temp.getCentre().getX(), (int) temp.getCentre().getY(), (int) temp.getWidth(), (int) temp.getHeight(), temp.getTexture(),g);	 
+			drawEnemies((int) temp.getCentre().getX(), (int) temp.getCentre().getY(), (int) temp.getWidth(), (int) temp.getHeight(), temp.getTexture(), temp.getDirection(), g);	 
 		 
 	    }); 
 	}
 	
-	private void drawEnemies(int x, int y, int width, int height, String texture, Graphics g) {
+	private void drawEnemies(int x, int y, int width, int height, String texture, char direction, Graphics g) {
 		File TextureToLoad = new File(texture);  //should work okay on OSX and Linux but check if you have issues depending your eclipse install or if your running this without an IDE 
 		try {
 			Image myImage = ImageIO.read(TextureToLoad);
-			//The spirte is 32x32 pixel wide and 4 of them are placed together so we need to grab a different one each time 
-			//remember your training :-) computer science everything starts at 0 so 32 pixels gets us to 31  
-			int currentPositionInAnimation= ((int) (CurrentAnimationTime%3)*44); //slows down animation so every 10 frames we get another frame so every 100ms 
-			g.drawImage(myImage, x,y, x+width, y+height, currentPositionInAnimation  , 0, currentPositionInAnimation+44, 50, null); 	
+			int xFrame = ((int) ((CurrentAnimationTime%9)/3)) * ((myImage.getWidth(null))/3); //slows down animation so every 3 frames we get another frame so every 50ms 
+			int yFrame = 0;
+			switch(direction) {
+				case 's':
+					yFrame = 0;
+					break;
+				case 'a':
+					yFrame = (int) ((myImage.getHeight(null)) / 4);
+					break;
+				case 'd':
+					yFrame = (int) (((myImage.getHeight(null)) / 4) * 2);
+					break;
+				case 'w':
+					yFrame = (int) ((((myImage.getHeight(null)) / 4) *2) + ((myImage.getHeight(null)) / 4));
+					break;
+			}
+			g.drawImage(myImage, x,y, x+width, y+height, xFrame, yFrame, xFrame + (myImage.getWidth(null)/3), yFrame + (myImage.getHeight(null)/4), null); 	
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -130,12 +144,47 @@ public class Viewer extends JPanel {
 		}
 	}
 	
-	private void drawBullet(int x, int y, int width, int height, String texture, Graphics g) {
+	private void drawBullet(int x, int y, int width, int height, String texture, char direction, Graphics g) {
 		File TextureToLoad = new File(texture);  //should work okay on OSX and Linux but check if you have issues depending your eclipse install or if your running this without an IDE 
 		try {
 			Image myImage = ImageIO.read(TextureToLoad); 
 			//64 by 128 
-			 g.drawImage(myImage, x,y, x+width, y+height, 0 , 0, 63, 127, null); 	
+			int xframe = 0;
+			int yframe = 0;
+			
+			if(texture.contains("witch")) {
+				xframe = 150;
+				yframe = 150;
+				g.drawImage(myImage, x,y, x+width, y+height, 0 , 0, xframe, yframe, null);
+			}
+			
+			if(texture.contains("archer")) {
+				yframe = 50;
+				switch(direction) {
+					case 'a':
+						xframe = 0;
+						break;
+					case 'd':
+						xframe = 43;
+						break;
+					case 'w':
+						xframe = 86;
+						break;
+					case 's':
+						xframe = 129;
+						break;
+				}
+				g.drawImage(myImage, x,y, x+width, y+height, xframe , 0, xframe + 42, yframe, null);
+			}
+			
+			if(texture.contains("brawler")) {
+				yframe = 52;
+				xframe = (int) ((CurrentAnimationTime%4) * ((myImage.getWidth(null))/4));
+				g.drawImage(myImage, x, y, x+width, y+width, xframe, 0, xframe + (myImage.getWidth(null)/4), yframe, null);
+			}
+				
+	        
+	        
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -147,10 +196,9 @@ public class Viewer extends JPanel {
 		try {
 			Image myImage = ImageIO.read(TextureToLoad);
 			
-			//The sprite is 32x32 pixel wide and 4 of them are placed together so we need to grab a different one each time 
-			//remember your training :-) computer science everything starts at 0 so 32 pixels gets us to 31  
+			//The sprite is 32x32 pixel wide, with 4 rows and 3 columns in each row
 			
-			int xFrame = ((int) ((CurrentAnimationTime%15)/5))*32; //slows down animation so every 10 frames we get another frame so every 100ms 
+			int xFrame = ((int) ((CurrentAnimationTime%15)/5))*32; //slows down animation so every 5 frames we get another frame so every 50ms 
 			int yFrame = 0;
 			switch(direction) {
 				case 's':
