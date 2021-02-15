@@ -30,11 +30,15 @@ SOFTWARE.
 
 //Singeton pattern
 public class Controller implements KeyListener { 
-	private static boolean KeyAPressed= false;
-	private static boolean KeySPressed= false;
-	private static boolean KeyDPressed= false;
-	private static boolean KeyWPressed= false;
-	private static boolean KeySpacePressed= false;
+	private static boolean KeyAPressed = false;
+	private static boolean KeySPressed = false;
+	private static boolean KeyDPressed = false;
+	private static boolean KeyWPressed = false;
+	private static boolean KeySpacePressed = false;
+	private static boolean KeyShiftAPressed = false;
+	private static boolean KeyShiftSPressed = false;
+	private static boolean KeyShiftDPressed = false;
+	private static boolean KeyShiftWPressed = false;
 	   
 	private static final Controller instance = new Controller();
 	   
@@ -66,6 +70,18 @@ public class Controller implements KeyListener {
 			case ' ':
 				setKeySpacePressed(true);
 				break;   
+			case 'A':
+				setKeyShiftAPressed(true);
+				break;
+			case 'S':
+				setKeyShiftSPressed(true);
+				break;
+			case 'W':
+				setKeyShiftWPressed(true);
+				break;
+			case 'D':
+				setKeyShiftDPressed(true);
+				break;
 		    default:
 		    	//System.out.println("Controller test:  Unknown key pressed");
 		        break;
@@ -90,7 +106,19 @@ public class Controller implements KeyListener {
 				break;
 			case ' ':
 				setKeySpacePressed(false);
-				break;   
+				break;  
+			case 'A':
+				setKeyShiftAPressed(false);
+				break;
+			case 'S':
+				setKeyShiftSPressed(false);
+				break;
+			case 'W':
+				setKeyShiftWPressed(false);
+				break;
+			case 'D':
+				setKeyShiftDPressed(false);
+				break;
 		    default:
 		    	//System.out.println("Controller test:  Unknown key pressed");
 		        break;
@@ -147,6 +175,38 @@ public class Controller implements KeyListener {
 	public void setKeySpacePressed(boolean keySpacePressed) {
 		KeySpacePressed = keySpacePressed;
 	} 
+	
+	public boolean isKeyShiftAPressed() {
+		return KeyShiftAPressed;
+	}
+	
+	public void setKeyShiftAPressed(boolean keyShiftAPressed) {
+		KeyShiftAPressed = keyShiftAPressed;
+	}
+	
+	public boolean isKeyShiftSPressed() {
+		return KeyShiftSPressed;
+	}
+	
+	public void setKeyShiftSPressed(boolean keyShiftSPressed) {
+		KeyShiftSPressed = keyShiftSPressed;
+	}
+	
+	public boolean isKeyShiftWPressed() {
+		return KeyShiftWPressed;
+	}
+	
+	public void setKeyShiftWPressed(boolean keyShiftWPressed) {
+		KeyShiftWPressed = keyShiftWPressed;
+	}
+	
+	public boolean isKeyShiftDPressed() {
+		return KeyShiftDPressed;
+	}
+	
+	public void setKeyShiftDPressed(boolean keyShiftDPressed) {
+		KeyShiftDPressed = keyShiftDPressed;
+	}
 }
 
 /*

@@ -2,6 +2,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.time.Instant;
+import java.time.Duration;
 
 import util.GameObject;
 import util.Player;
@@ -37,7 +39,8 @@ public class Model {
 	private CopyOnWriteArrayList<GameObject> EnemiesList = new CopyOnWriteArrayList<GameObject>();
 	private CopyOnWriteArrayList<GameObject> BulletList = new CopyOnWriteArrayList<GameObject>();
 	private HashMap<String, GameObject> enemyPlacement = new HashMap<String, GameObject>();
-	private int health = 10; 
+	private int health = 100; 
+	private static Instant createdBullet = null;
 
 	public Model() {
 		//setup game world 
@@ -64,7 +67,7 @@ public class Model {
 		// this is a way to increment across the array list data structure 
 		
 		//see if they hit anything 
-		// using enhanced for-loop style as it makes it alot easier both code wise and reading wise too 
+		// using enhanced for-loop style as it makes it a lot easier both code wise and reading wise too 
 		for (GameObject temp : EnemiesList) {
 			for (GameObject Bullet : BulletList) {
 				if (Math.abs(temp.getCentre().getX() - Bullet.getCentre().getX()) < temp.getWidth() 
@@ -123,14 +126,12 @@ public class Model {
 	}
 
 	private void enemyLogic() {
-		// TODO Auto-generated method stub
 		for (GameObject temp : EnemiesList) {
 		    // Move enemies 
 			if(temp.getCentre().getX() > Player.getCentre().getX()) {
 				temp.getCentre().ApplyVector(new Vector3f(-1, 0, 0));
 				temp.setDirection('a');
-			}
-			else if(temp.getCentre().getX() < Player.getCentre().getX()) {
+			} else if(temp.getCentre().getX() < Player.getCentre().getX()) {
 				temp.getCentre().ApplyVector(new Vector3f(1, 0, 0));
 				temp.setDirection('d');
 			}
@@ -138,8 +139,7 @@ public class Model {
 			if(temp.getCentre().getY() > Player.getCentre().getY()) {
 				temp.getCentre().ApplyVector(new Vector3f(0, 1, 0));
 				temp.setDirection('w');
-			}
-			else if(temp.getCentre().getY() < Player.getCentre().getY()) {
+			} else if(temp.getCentre().getY() < Player.getCentre().getY()) {
 				temp.getCentre().ApplyVector(new Vector3f(0, -1, 0));
 				temp.setDirection('s');
 			}
@@ -147,13 +147,9 @@ public class Model {
 			//see if they collide with the player
 			if (Math.abs(temp.getCentre().getX() - Player.getCentre().getX()) < temp.getWidth() 
 				&& Math.abs(temp.getCentre().getY()- Player.getCentre().getY()) < temp.getHeight()) {
-					health--;
+					health = health - Player.gethealth();
 					temp.getCentre().ApplyVector(new Vector3f(0, 20, 0));
 				}
-			
-			if (temp.getCentre().getY() == 900.0f) {
-				EnemiesList.remove(temp);
-			}
 		}
 		
 		if (EnemiesList.size()<2) {
@@ -162,9 +158,7 @@ public class Model {
 	}
 
 	private void bulletLogic() {
-		// TODO Auto-generated method stub
 		// move bullets 
-	  
 		for (GameObject temp : BulletList) {
 		    //check to move them
 			if(temp.getDirection() == 'a') {
@@ -179,8 +173,6 @@ public class Model {
 			else if(temp.getDirection() == 's') {
 				temp.getCentre().ApplyVector(new Vector3f(0,-3,0));
 			}
-			
-			//see if they hit anything 
 			
 			//see if they get to the border of the screen
 			if (temp.getCentre().getY()==0 || temp.getCentre().getY() == 900 
@@ -216,44 +208,41 @@ public class Model {
 			Player.setDirection('s');
 		}
 		
-//		private static DateTime createdBullet = null;
+
 		if(Controller.getInstance().isKeySpacePressed()) {
-//			if (createdBullet == null) {
-//				CreateBullet();
-//				createdBuller = DateTime.Now();
-//			} else 
-//			{
-//				var now = DateTime.Now();
-//				if (now - createdbullet  5s)
-//					CreateBullet();
-//					createdBuller = DateTime.Now();
-//			}
-			CreateBullet();
+			if (createdBullet == null) {
+				CreateBullet();
+				createdBullet = Instant.now();
+			} else {
+				Instant now = Instant.now();
+				long timePassed = Duration.between(createdBullet, now).toMillis();
+				if (timePassed > Player.getFireRate()) {
+					CreateBullet();
+					createdBullet = Instant.now();
+				}
+			}
 			Controller.getInstance().setKeySpacePressed(false);
 		} 
 		
-//		if(Controller.getInstance().isKeyAPressed() && Controller.getInstance().isKeySpacePressed()) {
-//			Player.getCentre().ApplyVector( new Vector3f(-2,0,0)); 
-//			Player.setDirection('d');
-//			CreateBullet();
-//			Controller.getInstance().setKeySpacePressed(false);
-//		}
+		if(Controller.getInstance().isKeyShiftAPressed()) {
+			Player.getCentre().ApplyVector( new Vector3f(-2,0,0));
+			Player.setDirection('d');
+		}
 		
-//		if(Controller.getInstance().isKeyDPressed()) {
-//			Player.getCentre().ApplyVector( new Vector3f(2,0,0));
-//			Player.setDirection('d');
-//		}
-//			
-//		if(Controller.getInstance().isKeyWPressed()) {
-//			Player.getCentre().ApplyVector( new Vector3f(0,2,0));
-//			Player.setDirection('w');
-//		}
-//		
-//		if(Controller.getInstance().isKeySPressed()) {
-//			Player.getCentre().ApplyVector( new Vector3f(0,-2,0));
-//			Player.setDirection('s');
-//		}
+		if(Controller.getInstance().isKeyShiftDPressed()) {
+			Player.getCentre().ApplyVector( new Vector3f(2,0,0));
+			Player.setDirection('a');
+		}
 		
+		if(Controller.getInstance().isKeyShiftWPressed()) {
+			Player.getCentre().ApplyVector( new Vector3f(0,2,0));
+			Player.setDirection('s');
+		}
+		
+		if(Controller.getInstance().isKeyShiftSPressed()) {
+			Player.getCentre().ApplyVector( new Vector3f(0,-2,0));
+			Player.setDirection('w');
+		}		
 	}
 
 	private void CreateBullet() {
@@ -297,13 +286,13 @@ public class Model {
 	
 	public void selectPlayer(int chosen) {
 		if(chosen == 0) {
-			Player = new Player("Archer", 2, 1, "res/Player/archer.png", 50, 50, new Point3f(450, 450, 0), 's');
+			Player = new Player("Archer", 2, 10, "res/Player/archer.png", 50, 50, new Point3f(450, 450, 0), 's');
 		}
 		else if(chosen == 1) {
-			Player = new Player("Witch", 3, 3, "res/Player/wizard.png", 50, 50, new Point3f(450, 450, 0), 's');
+			Player = new Player("Witch", 3, 200, "res/Player/wizard.png", 50, 50, new Point3f(450, 450, 0), 's');
 		}
 		else if(chosen == 2) {
-			Player = new Player("Brawler", 1, 5, "res/Player/brawler.png", 50, 50, new Point3f(450, 450, 0), 's');
+			Player = new Player("Brawler", 1, 500, "res/Player/brawler.png", 50, 50, new Point3f(450, 450, 0), 's');
 		}
 	}
 
