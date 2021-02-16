@@ -7,6 +7,7 @@ import java.time.Duration;
 
 import util.GameObject;
 import util.Player;
+import util.Bullet;
 import util.Point3f;
 import util.Vector3f; 
 /*
@@ -37,10 +38,11 @@ public class Model {
 	private Player Player;
 	private Controller controller = Controller.getInstance();
 	private CopyOnWriteArrayList<GameObject> EnemiesList = new CopyOnWriteArrayList<GameObject>();
-	private CopyOnWriteArrayList<GameObject> BulletList = new CopyOnWriteArrayList<GameObject>();
+	private CopyOnWriteArrayList<Bullet> BulletList = new CopyOnWriteArrayList<Bullet>();
 	private HashMap<String, GameObject> enemyPlacement = new HashMap<String, GameObject>();
 	private int health = 100; 
 	private static Instant createdBullet = null;
+	private boolean drawFire = false;
 
 	public Model() {
 		//setup game world 
@@ -64,19 +66,16 @@ public class Model {
 	}
 
 	private void gameLogic() {
-		// this is a way to increment across the array list data structure 
-		
-		//see if they hit anything 
-		// using enhanced for-loop style as it makes it a lot easier both code wise and reading wise too 
-		for (GameObject temp : EnemiesList) {
-			for (GameObject Bullet : BulletList) {
-				if (Math.abs(temp.getCentre().getX() - Bullet.getCentre().getX()) < temp.getWidth() 
-					&& Math.abs(temp.getCentre().getY()- Bullet.getCentre().getY()) < temp.getHeight()) {
-					EnemiesList.remove(temp);
-					BulletList.remove(Bullet);
-				}
-			}
-		}		
+		if(Player.getRole() == "Archer") {
+			Player.getArcherDamage(EnemiesList, BulletList);
+		}
+		else if(Player.getRole() == "Witch") {
+			drawFire = Player.getWitchDamage(EnemiesList, BulletList);
+		}
+		else if(Player.getRole() == "Brawler") {
+			Player.getBrawlerDamage(EnemiesList, BulletList);
+		}
+				
 	}
 	
 	private void placeEnemies() {		
@@ -247,11 +246,14 @@ public class Model {
 
 	private void CreateBullet() {
 		if(Player.getRole() == "Witch") {
-			BulletList.add(new GameObject("res/Bullets/witch_bullet.png",64,64,new Point3f(Player.getCentre().getX(),Player.getCentre().getY(),0.0f), Player.getDirection()));
+			BulletList.add(new Bullet("res/Bullets/witch_bullet.png",64,64,new Point3f(Player.getCentre().getX(),Player.getCentre().getY(),0.0f), 
+										Player.getDirection(), 0));
 		} else if(Player.getRole() == "Archer") {
-			BulletList.add(new GameObject("res/Bullets/archer_bullets.png",64,64,new Point3f(Player.getCentre().getX(),Player.getCentre().getY(),0.0f), Player.getDirection()));
+			BulletList.add(new Bullet("res/Bullets/archer_bullets.png",64,64,new Point3f(Player.getCentre().getX(),Player.getCentre().getY(),0.0f),
+										Player.getDirection(), 0));
 		} else if(Player.getRole() == "Brawler") {
-			BulletList.add(new GameObject("res/Bullets/brawler_bullets.png",64,64,new Point3f(Player.getCentre().getX(),Player.getCentre().getY(),0.0f), Player.getDirection()));
+			BulletList.add(new Bullet("res/Bullets/brawler_bullets.png",64,64,new Point3f(Player.getCentre().getX(),Player.getCentre().getY(),0.0f),
+										Player.getDirection(), 0));
 		}		
 	}
 	
@@ -304,12 +306,16 @@ public class Model {
 		return EnemiesList;
 	}
 	
-	public CopyOnWriteArrayList<GameObject> getBullets() {
+	public CopyOnWriteArrayList<Bullet> getBullets() {
 		return BulletList;
 	}
 
 	public int getHealth() { 
 		return health;
+	}
+	
+	public boolean getDrawFire() {
+		return drawFire;
 	}
 }
 

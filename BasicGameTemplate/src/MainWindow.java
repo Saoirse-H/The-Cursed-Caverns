@@ -108,15 +108,13 @@ public class MainWindow {
 			while (FrameCheck > System.currentTimeMillis()){ } 
 			
 			if(inBeginning) {
-				/* 1. Pop up
-				 * 2. Choose character
-				 * 3. Send info to model to assign sprite
-				 * 4. Set inBeginning to false
-				 */
 				Object[] characters = {"Archer", "Witch", "Brawler"};
 				ImageIcon icon = new ImageIcon("res/hooded-figure.png");
-				int chosenCharacter = JOptionPane.showOptionDialog(frame, "Please choose a player:", "Who are you?", JOptionPane.DEFAULT_OPTION, 
+				int chosenCharacter = -1;
+				while(chosenCharacter == -1) {	
+					chosenCharacter = JOptionPane.showOptionDialog(frame, "Please choose a player:", "Who are you?", JOptionPane.DEFAULT_OPTION, 
 																   JOptionPane.PLAIN_MESSAGE, icon, characters, characters[0]);
+				}
 				gameworld.selectPlayer(chosenCharacter);
 				inBeginning = false;
 			}

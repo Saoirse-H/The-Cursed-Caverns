@@ -86,6 +86,15 @@ public class Point3f {
 	public Vector3f MinusPoint(Point3f Minus) { 
 		return new Vector3f(this.getX()-Minus.getX(), this.getY()-Minus.getY(), this.getZ()-Minus.getZ());
 	}
+	
+	public double distance(Point3f point2) {
+		// distance = sqrt((x2-x1)^2 + (y2-y1)^2)
+		float xDistance = (point2.getX() - this.getX()) * (point2.getX() - this.getX());
+		float yDistance = (point2.getY() - this.getY()) * (point2.getY() - this.getY());
+		
+		double distance = Math.sqrt(xDistance + yDistance);
+		return distance;
+	}
 	 
 	//Use for direct application of a Vector 
 	public void ApplyVector(Vector3f vector) { 

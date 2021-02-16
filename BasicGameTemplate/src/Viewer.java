@@ -48,7 +48,7 @@ SOFTWARE.
 public class Viewer extends JPanel {
 	private long CurrentAnimationTime= 0; 
 	
-	Model gameworld =new Model(); 
+	Model gameworld = new Model(); 
 	 
 	public Viewer(Model World) {
 		this.gameworld = World;
@@ -153,8 +153,8 @@ public class Viewer extends JPanel {
 			int yframe = 0;
 			
 			if(texture.contains("witch")) {
-				xframe = 150;
-				yframe = 150;
+				xframe = 32;
+				yframe = 32;
 				g.drawImage(myImage, x,y, x+width, y+height, 0 , 0, xframe, yframe, null);
 			}
 			
