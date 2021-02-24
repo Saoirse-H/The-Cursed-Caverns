@@ -56,11 +56,11 @@ public class MainWindow {
 	private JLabel BackgroundImageForStartMenu ;
 	  
 	public MainWindow() {
-		frame.setSize(1000, 1000);  // you can customise this later and adapt it to change on size.  
+		frame.setSize(1024, 1072);  // you can customise this later and adapt it to change on size.  
 	    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);   //If exit // you can modify with your way of quitting , just is a template.
 	    frame.setLayout(null);
 	    frame.add(canvas);  
-	    canvas.setBounds(0, 0, 1000, 1000); 
+	    canvas.setBounds(0, 0, 1024, 1024); 
 		canvas.setBackground(new Color(255,255,255)); //white background  replaced by Space background but if you remove the background method this will draw a white screen 
 		canvas.setVisible(false);   // this will become visible after you press the key. 
 		          
@@ -147,7 +147,7 @@ public class MainWindow {
 		
 		// Both these calls could be setup as  a thread but we want to simplify the game logic for you.  
 		//score update  
-		frame.setTitle("HP =  "+ gameworld.getHealth()); 	 
+		frame.setTitle("HP =  "+ gameworld.getHealth()); 
 	}
 
 }

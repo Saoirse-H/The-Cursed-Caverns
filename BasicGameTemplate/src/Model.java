@@ -81,9 +81,9 @@ public class Model {
 	private void placeEnemies() {		
 		//top left corner
 		while(enemyPlacement.size() < 3) {
-			Point3f enemy = new Point3f(((float) Math.random() * 201), ((float) Math.random() * 201), 0);
+			Point3f enemy = new Point3f(((float) Math.random() * 176) + 672, ((float) Math.random() * 128) + 96, 0);
 			if(!enemyPlacement.containsKey(enemy.toString())) {
-				GameObject temp = new GameObject(enemyTexture(), 50, 50, enemy, 's');
+				GameObject temp = new GameObject(enemyTexture(), 32, 32, enemy, 's');
 				enemyPlacement.put(enemy.toString(), temp);
 				EnemiesList.add(temp);
 			}
@@ -92,9 +92,9 @@ public class Model {
 		
 		//top right corner
 		while(enemyPlacement.size() < 3) {
-			Point3f enemy = new Point3f(((float) Math.random() * 201) + 700, ((float) Math.random() * 201), 0);
+			Point3f enemy = new Point3f(((float) Math.random() * 144) + 832, ((float) Math.random() * 112) + 816, 0);
 			if(!enemyPlacement.containsKey(enemy.toString())) {
-				GameObject temp = new GameObject(enemyTexture(), 50, 50, enemy, 's');
+				GameObject temp = new GameObject(enemyTexture(), 32, 32, enemy, 's');
 				enemyPlacement.put(enemy.toString(), temp);
 				EnemiesList.add(temp);
 			}
@@ -103,20 +103,9 @@ public class Model {
 		
 		//bottom left corner
 		while(enemyPlacement.size() < 3) {
-			Point3f enemy = new Point3f(((float) Math.random() * 201), (((float) Math.random() * 201) + 700), 0);
+			Point3f enemy = new Point3f(((float) Math.random() * 128) + 612, (((float) Math.random() * 128) + 640), 0);
 			if(!enemyPlacement.containsKey(enemy.toString())) {
-				GameObject temp = new GameObject(enemyTexture(), 50, 50, enemy, 's');
-				enemyPlacement.put(enemy.toString(), temp);
-				EnemiesList.add(temp);
-			}
-		}
-		enemyPlacement.clear();
-		
-		//bottom right corner 
-		while(enemyPlacement.size() < 3) {
-			Point3f enemy = new Point3f(((float) Math.random() * 201) + 700, (((float) Math.random() * 201) + 700), 0);
-			if(!enemyPlacement.containsKey(enemy.toString())) {
-				GameObject temp = new GameObject(enemyTexture(), 50, 50, enemy, 's');
+				GameObject temp = new GameObject(enemyTexture(), 32, 32, enemy, 's');
 				enemyPlacement.put(enemy.toString(), temp);
 				EnemiesList.add(temp);
 			}
@@ -174,8 +163,8 @@ public class Model {
 			}
 			
 			//see if they get to the border of the screen
-			if (temp.getCentre().getY()==0 || temp.getCentre().getY() == 900 
-				|| temp.getCentre().getX() ==0 || temp.getCentre().getX() == 900) {
+			if (temp.getCentre().getY() <= 0 || temp.getCentre().getY() >= 992 
+				|| temp.getCentre().getX() <= 0 || temp.getCentre().getX() >= 992) {
 			 	BulletList.remove(temp);
 			} 
 		} 
@@ -188,22 +177,22 @@ public class Model {
 		//check for movement and if you fired a bullet 
 		  
 		if(Controller.getInstance().isKeyAPressed()) {
-			Player.getCentre().ApplyVector( new Vector3f(-2,0,0)); 
+			Player.getCentre().ApplyVector( new Vector3f(-1,0,0)); 
 			Player.setDirection('a');
 		}
 		
 		if(Controller.getInstance().isKeyDPressed()) {
-			Player.getCentre().ApplyVector( new Vector3f(2,0,0));
+			Player.getCentre().ApplyVector( new Vector3f(1,0,0));
 			Player.setDirection('d');
 		}
 			
 		if(Controller.getInstance().isKeyWPressed()) {
-			Player.getCentre().ApplyVector( new Vector3f(0,2,0));
+			Player.getCentre().ApplyVector( new Vector3f(0,1,0));
 			Player.setDirection('w');
 		}
 		
 		if(Controller.getInstance().isKeySPressed()) {
-			Player.getCentre().ApplyVector( new Vector3f(0,-2,0));
+			Player.getCentre().ApplyVector( new Vector3f(0,-1,0));
 			Player.setDirection('s');
 		}
 		
@@ -224,35 +213,35 @@ public class Model {
 		} 
 		
 		if(Controller.getInstance().isKeyShiftAPressed()) {
-			Player.getCentre().ApplyVector( new Vector3f(-2,0,0));
+			Player.getCentre().ApplyVector( new Vector3f(-1,0,0));
 			Player.setDirection('d');
 		}
 		
 		if(Controller.getInstance().isKeyShiftDPressed()) {
-			Player.getCentre().ApplyVector( new Vector3f(2,0,0));
+			Player.getCentre().ApplyVector( new Vector3f(1,0,0));
 			Player.setDirection('a');
 		}
 		
 		if(Controller.getInstance().isKeyShiftWPressed()) {
-			Player.getCentre().ApplyVector( new Vector3f(0,2,0));
+			Player.getCentre().ApplyVector( new Vector3f(0,1,0));
 			Player.setDirection('s');
 		}
 		
 		if(Controller.getInstance().isKeyShiftSPressed()) {
-			Player.getCentre().ApplyVector( new Vector3f(0,-2,0));
+			Player.getCentre().ApplyVector( new Vector3f(0,-1,0));
 			Player.setDirection('w');
 		}		
 	}
 
 	private void CreateBullet() {
 		if(Player.getRole() == "Witch") {
-			BulletList.add(new Bullet("res/Bullets/witch_bullet.png",64,64,new Point3f(Player.getCentre().getX(),Player.getCentre().getY(),0.0f), 
+			BulletList.add(new Bullet("res/Bullets/witch_bullet.png",31,31,new Point3f(Player.getCentre().getX(),Player.getCentre().getY(),0.0f), 
 										Player.getDirection(), 0));
 		} else if(Player.getRole() == "Archer") {
-			BulletList.add(new Bullet("res/Bullets/archer_bullets.png",64,64,new Point3f(Player.getCentre().getX(),Player.getCentre().getY(),0.0f),
+			BulletList.add(new Bullet("res/Bullets/archer_bullets.png",31,31,new Point3f(Player.getCentre().getX(),Player.getCentre().getY(),0.0f),
 										Player.getDirection(), 0));
 		} else if(Player.getRole() == "Brawler") {
-			BulletList.add(new Bullet("res/Bullets/brawler_bullets.png",64,64,new Point3f(Player.getCentre().getX(),Player.getCentre().getY(),0.0f),
+			BulletList.add(new Bullet("res/Bullets/brawler_bullets.png",31,31,new Point3f(Player.getCentre().getX(),Player.getCentre().getY(),0.0f),
 										Player.getDirection(), 0));
 		}		
 	}
@@ -288,13 +277,13 @@ public class Model {
 	
 	public void selectPlayer(int chosen) {
 		if(chosen == 0) {
-			Player = new Player("Archer", 2, 10, "res/Player/archer.png", 50, 50, new Point3f(450, 450, 0), 's');
+			Player = new Player("Archer", 2, 10, "res/Player/archer.png", 24, 24, new Point3f(96, 96, 0), 's');
 		}
 		else if(chosen == 1) {
-			Player = new Player("Witch", 3, 200, "res/Player/wizard.png", 50, 50, new Point3f(450, 450, 0), 's');
+			Player = new Player("Witch", 3, 200, "res/Player/wizard.png", 24, 24, new Point3f(96, 96, 0), 's');
 		}
 		else if(chosen == 2) {
-			Player = new Player("Brawler", 1, 500, "res/Player/brawler.png", 50, 50, new Point3f(450, 450, 0), 's');
+			Player = new Player("Brawler", 1, 500, "res/Player/brawler.png", 24, 24, new Point3f(96, 96, 0), 's');
 		}
 	}
 

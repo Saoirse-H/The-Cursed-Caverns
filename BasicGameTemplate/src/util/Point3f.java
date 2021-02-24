@@ -32,7 +32,7 @@ public class Point3f {
 	private float y;
 	private float z;
 	
-	private int boundary = 900;
+	private int boundary = 992;
 	
 	// default constructor
 	public Point3f() { 
@@ -96,6 +96,13 @@ public class Point3f {
 		return distance;
 	}
 	 
+	public Point3f checkVector(Vector3f vector) {
+		float newX = CheckBoundary(this.getX()+vector.getX());
+		float newY = CheckBoundary(this.getY()-vector.getY());
+		float newZ = CheckBoundary(this.getZ()-vector.getZ());
+		
+		return new Point3f(newX, newY, newZ);
+	}
 	//Use for direct application of a Vector 
 	public void ApplyVector(Vector3f vector) { 
 		setX(CheckBoundary(this.getX()+vector.getX()));
