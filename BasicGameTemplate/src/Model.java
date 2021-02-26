@@ -2,14 +2,16 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
 import java.util.concurrent.CopyOnWriteArrayList;
+
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+
 import java.time.Instant;
+import java.io.File;
 import java.time.Duration;
 
-import util.GameObject;
-import util.Player;
-import util.Bullet;
-import util.Point3f;
-import util.Vector3f; 
+import util.*; 
 /*
  * Created by Abraham Campbell on 15/01/2020.
  *   Copyright (c) 2020  Abraham Campbell
@@ -40,17 +42,18 @@ public class Model {
 	private CopyOnWriteArrayList<GameObject> EnemiesList = new CopyOnWriteArrayList<GameObject>();
 	private CopyOnWriteArrayList<Bullet> BulletList = new CopyOnWriteArrayList<Bullet>();
 	private HashMap<String, GameObject> enemyPlacement = new HashMap<String, GameObject>();
+	private Map map = new Map();
 	private int health = 100; 
 	private static Instant createdBullet = null;
+	private static Instant footstep = null;
 	private boolean drawFire = false;
 
 	public Model() {
 		//setup game world 
 		//Player 
 		Player = new Player();
-		//Enemies  starting with four 
+		//Enemies 
 		placeEnemies();
-		//EnemiesList.add(new GameObject("res/UFO.png",50,50,new Point3f(((float)Math.random()*100+400 ),0,0)));
 	}
 	
 	//This is the heart of the game, where the model takes in all the inputs, decides the outcomes and then changes the model accordingly. 
@@ -66,48 +69,57 @@ public class Model {
 	}
 
 	private void gameLogic() {
+		boolean hit = false;
+		
 		if(Player.getRole() == "Archer") {
-			Player.getArcherDamage(EnemiesList, BulletList);
+			hit = Player.getArcherDamage(EnemiesList, BulletList, map);
 		}
 		else if(Player.getRole() == "Witch") {
-			drawFire = Player.getWitchDamage(EnemiesList, BulletList);
+			hit = Player.getWitchDamage(EnemiesList, BulletList, map);
 		}
 		else if(Player.getRole() == "Brawler") {
-			Player.getBrawlerDamage(EnemiesList, BulletList);
+			hit = Player.getBrawlerDamage(EnemiesList, BulletList, map);
+		}
+		
+		if(hit) {
+			playSound("res/audio/punch.wav");
 		}
 				
 	}
 	
 	private void placeEnemies() {		
-		//top left corner
-		while(enemyPlacement.size() < 3) {
+		//room 1
+		while(enemyPlacement.size() < 10) {
 			Point3f enemy = new Point3f(((float) Math.random() * 176) + 672, ((float) Math.random() * 128) + 96, 0);
-			if(!enemyPlacement.containsKey(enemy.toString())) {
-				GameObject temp = new GameObject(enemyTexture(), 32, 32, enemy, 's');
+			if(!enemyPlacement.containsKey(enemy.toString()) && map.checkEnemyTile(enemy, new Vector3f(0,0,0))) {
+				GameObject temp = new GameObject(enemyTexture(), 24, 24, enemy, 's');
 				enemyPlacement.put(enemy.toString(), temp);
 				EnemiesList.add(temp);
+				map.setEnemyTile(temp.getCentre(), 0);
 			}
 		}
 		enemyPlacement.clear();
 		
-		//top right corner
-		while(enemyPlacement.size() < 3) {
+		//room 2
+		while(enemyPlacement.size() < 10) {
 			Point3f enemy = new Point3f(((float) Math.random() * 144) + 832, ((float) Math.random() * 112) + 816, 0);
-			if(!enemyPlacement.containsKey(enemy.toString())) {
-				GameObject temp = new GameObject(enemyTexture(), 32, 32, enemy, 's');
+			if(!enemyPlacement.containsKey(enemy.toString()) && map.checkEnemyTile(enemy, new Vector3f(0,0,0))) {
+				GameObject temp = new GameObject(enemyTexture(), 24, 24, enemy, 's');
 				enemyPlacement.put(enemy.toString(), temp);
 				EnemiesList.add(temp);
+				map.setEnemyTile(temp.getCentre(), 0);
 			}
 		}
 		enemyPlacement.clear();
 		
-		//bottom left corner
-		while(enemyPlacement.size() < 3) {
-			Point3f enemy = new Point3f(((float) Math.random() * 128) + 612, (((float) Math.random() * 128) + 640), 0);
-			if(!enemyPlacement.containsKey(enemy.toString())) {
-				GameObject temp = new GameObject(enemyTexture(), 32, 32, enemy, 's');
+		//room 3
+		while(enemyPlacement.size() < 10) {
+			Point3f enemy = new Point3f(((float) Math.random() * 112) + 628, (((float) Math.random() * 112) + 670), 0);
+			if(!enemyPlacement.containsKey(enemy.toString()) && map.checkEnemyTile(enemy, new Vector3f(0,0,0))) {
+				GameObject temp = new GameObject(enemyTexture(), 24, 24, enemy, 's');
 				enemyPlacement.put(enemy.toString(), temp);
 				EnemiesList.add(temp);
+				map.setEnemyTile(temp.getCentre(), 0);
 			}
 		}
 		enemyPlacement.clear();
@@ -116,27 +128,67 @@ public class Model {
 	private void enemyLogic() {
 		for (GameObject temp : EnemiesList) {
 		    // Move enemies 
-			if(temp.getCentre().getX() > Player.getCentre().getX()) {
-				temp.getCentre().ApplyVector(new Vector3f(-1, 0, 0));
+			// Move left towards player
+			if((int) temp.getCentre().getX() > (int) Player.getCentre().getX()) {
+				if(map.checkTile(temp.getCentre(), new Vector3f(-1, 0, 0)) && map.checkEnemyTile(temp.getCentre(), new Vector3f(-1, 0, 0))) {
+					map.setEnemyTile(temp.getCentre(), 1);
+					temp.getCentre().ApplyVector(new Vector3f(-1, 0, 0));
+					map.setEnemyTile(temp.getCentre(), 0);
+				}
+				
 				temp.setDirection('a');
-			} else if(temp.getCentre().getX() < Player.getCentre().getX()) {
-				temp.getCentre().ApplyVector(new Vector3f(1, 0, 0));
+			} 
+			// Move right towards player
+			else if((int) temp.getCentre().getX() < (int) Player.getCentre().getX()) {
+				if(map.checkTile(temp.getCentre(), new Vector3f(1, 0, 0)) && map.checkEnemyTile(temp.getCentre(), new Vector3f(1, 0, 0))) {
+					map.setEnemyTile(temp.getCentre(), 1);
+					temp.getCentre().ApplyVector(new Vector3f(1, 0, 0));
+					map.setEnemyTile(temp.getCentre(), 0);
+				}
+				
 				temp.setDirection('d');
 			}
 			
-			if(temp.getCentre().getY() > Player.getCentre().getY()) {
-				temp.getCentre().ApplyVector(new Vector3f(0, 1, 0));
+			// Move up towards the player
+			if((int) temp.getCentre().getY() > (int) Player.getCentre().getY()) {
+				if(map.checkTile(temp.getCentre(), new Vector3f(0, 1, 0)) && map.checkEnemyTile(temp.getCentre(), new Vector3f(0, 1, 0))) {
+					map.setEnemyTile(temp.getCentre(), 1);
+					temp.getCentre().ApplyVector(new Vector3f(0, 1, 0));
+					map.setEnemyTile(temp.getCentre(), 0);
+				}
+				
 				temp.setDirection('w');
-			} else if(temp.getCentre().getY() < Player.getCentre().getY()) {
-				temp.getCentre().ApplyVector(new Vector3f(0, -1, 0));
+			} 
+			// Move down towards the player
+			else if((int) temp.getCentre().getY() < (int) Player.getCentre().getY()) {
+				if(map.checkTile(temp.getCentre(), new Vector3f(0, -1, 0)) && map.checkEnemyTile(temp.getCentre(), new Vector3f(0, -1, 0))) {
+					map.setEnemyTile(temp.getCentre(), 1);
+					temp.getCentre().ApplyVector(new Vector3f(0, -1, 0));
+					map.setEnemyTile(temp.getCentre(), 0);
+				}
 				temp.setDirection('s');
 			}
 						 
 			//see if they collide with the player
 			if (Math.abs(temp.getCentre().getX() - Player.getCentre().getX()) < temp.getWidth() 
 				&& Math.abs(temp.getCentre().getY()- Player.getCentre().getY()) < temp.getHeight()) {
-					health = health - Player.gethealth();
-					temp.getCentre().ApplyVector(new Vector3f(0, 20, 0));
+					health = ((health - Player.gethealth()) < 0) ? 0 : health - Player.gethealth();
+					
+					//Check direction the enemy game from
+					switch(temp.getDirection()) {
+						case 'a':
+							temp.getCentre().ApplyVector(new Vector3f(32, 0, 0));
+							break;
+						case 'd':
+							temp.getCentre().ApplyVector(new Vector3f(-32, 0, 0));
+							break;
+						case 'w':
+							temp.getCentre().ApplyVector(new Vector3f(0, -32, 0));
+							break;
+						case 's':
+							temp.getCentre().ApplyVector(new Vector3f(0, 32, 0));
+							break;
+					}
 				}
 		}
 		
@@ -150,22 +202,28 @@ public class Model {
 		for (GameObject temp : BulletList) {
 		    //check to move them
 			if(temp.getDirection() == 'a') {
-				temp.getCentre().ApplyVector(new Vector3f(-3,0,0));
+				if(map.checkTile(temp.getCentre(), new Vector3f(-3,0,0)))
+					temp.getCentre().ApplyVector(new Vector3f(-3,0,0));
+				else
+					BulletList.remove(temp);
 			}
 			else if(temp.getDirection() == 'd') {
-				temp.getCentre().ApplyVector(new Vector3f(3,0,0));
+				if(map.checkTile(temp.getCentre(), new Vector3f(3,0,0)))
+					temp.getCentre().ApplyVector(new Vector3f(3,0,0));
+				else
+					BulletList.remove(temp);
 			}
 			else if(temp.getDirection() == 'w') {
-				temp.getCentre().ApplyVector(new Vector3f(0,3,0));
+				if(map.checkTile(temp.getCentre(), new Vector3f(0,3,0)))
+					temp.getCentre().ApplyVector(new Vector3f(0,3,0));
+				else
+					BulletList.remove(temp);
 			}
 			else if(temp.getDirection() == 's') {
-				temp.getCentre().ApplyVector(new Vector3f(0,-3,0));
-			}
-			
-			//see if they get to the border of the screen
-			if (temp.getCentre().getY() <= 0 || temp.getCentre().getY() >= 992 
-				|| temp.getCentre().getX() <= 0 || temp.getCentre().getX() >= 992) {
-			 	BulletList.remove(temp);
+				if(map.checkTile(temp.getCentre(), new Vector3f(0,-3,0)))
+					temp.getCentre().ApplyVector(new Vector3f(0,-3,0));
+				else
+					BulletList.remove(temp);
 			} 
 		} 
 		
@@ -177,23 +235,39 @@ public class Model {
 		//check for movement and if you fired a bullet 
 		  
 		if(Controller.getInstance().isKeyAPressed()) {
-			Player.getCentre().ApplyVector( new Vector3f(-1,0,0)); 
+			//Check if player can move to that tile
+			if(map.checkTile(Player.getCentre(), new Vector3f(-1,0,0)))
+				Player.getCentre().ApplyVector( new Vector3f(-1,0,0)); 
+			
 			Player.setDirection('a');
+//			playFootsteps();
 		}
 		
 		if(Controller.getInstance().isKeyDPressed()) {
-			Player.getCentre().ApplyVector( new Vector3f(1,0,0));
+			//Check if player can move to that tile
+			if(map.checkTile(Player.getCentre(), new Vector3f(1,0,0)))
+				Player.getCentre().ApplyVector( new Vector3f(1,0,0));
+			
 			Player.setDirection('d');
+//			playFootsteps();
 		}
 			
 		if(Controller.getInstance().isKeyWPressed()) {
-			Player.getCentre().ApplyVector( new Vector3f(0,1,0));
+			//Check if player can move to that tile
+			if(map.checkTile(Player.getCentre(), new Vector3f(0,1,0)))
+				Player.getCentre().ApplyVector( new Vector3f(0,1,0));
+			
 			Player.setDirection('w');
+//			playFootsteps();
 		}
 		
 		if(Controller.getInstance().isKeySPressed()) {
-			Player.getCentre().ApplyVector( new Vector3f(0,-1,0));
+			//Check if player can move to that tile
+			if(map.checkTile(Player.getCentre(), new Vector3f(0,-1,0)))
+				Player.getCentre().ApplyVector( new Vector3f(0,-1,0));
+			
 			Player.setDirection('s');
+//			playFootsteps();
 		}
 		
 
@@ -213,23 +287,35 @@ public class Model {
 		} 
 		
 		if(Controller.getInstance().isKeyShiftAPressed()) {
-			Player.getCentre().ApplyVector( new Vector3f(-1,0,0));
+			if(map.checkTile(Player.getCentre(), new Vector3f(-1,0,0)))
+				Player.getCentre().ApplyVector( new Vector3f(-1,0,0));
+			
 			Player.setDirection('d');
+//			playFootsteps();
 		}
 		
 		if(Controller.getInstance().isKeyShiftDPressed()) {
-			Player.getCentre().ApplyVector( new Vector3f(1,0,0));
+			if(map.checkTile(Player.getCentre(), new Vector3f(1,0,0)))
+				Player.getCentre().ApplyVector( new Vector3f(1,0,0));
+			
 			Player.setDirection('a');
+//			playFootsteps();
 		}
 		
 		if(Controller.getInstance().isKeyShiftWPressed()) {
-			Player.getCentre().ApplyVector( new Vector3f(0,1,0));
+			if(map.checkTile(Player.getCentre(), new Vector3f(0,1,0)))
+				Player.getCentre().ApplyVector( new Vector3f(0,1,0));
+			
 			Player.setDirection('s');
+//			playFootsteps();
 		}
 		
 		if(Controller.getInstance().isKeyShiftSPressed()) {
-			Player.getCentre().ApplyVector( new Vector3f(0,-1,0));
+			if(map.checkTile(Player.getCentre(), new Vector3f(0,-1,0)))
+				Player.getCentre().ApplyVector( new Vector3f(0,-1,0));
+			
 			Player.setDirection('w');
+//			playFootsteps();
 		}		
 	}
 
@@ -237,12 +323,17 @@ public class Model {
 		if(Player.getRole() == "Witch") {
 			BulletList.add(new Bullet("res/Bullets/witch_bullet.png",31,31,new Point3f(Player.getCentre().getX(),Player.getCentre().getY(),0.0f), 
 										Player.getDirection(), 0));
-		} else if(Player.getRole() == "Archer") {
+			playSound("res/audio/witch_bullet.wav");
+		} 
+		else if(Player.getRole() == "Archer") {
 			BulletList.add(new Bullet("res/Bullets/archer_bullets.png",31,31,new Point3f(Player.getCentre().getX(),Player.getCentre().getY(),0.0f),
 										Player.getDirection(), 0));
-		} else if(Player.getRole() == "Brawler") {
+			playSound("res/audio/archer_bullet.wav");
+		} 
+		else if(Player.getRole() == "Brawler") {
 			BulletList.add(new Bullet("res/Bullets/brawler_bullets.png",31,31,new Point3f(Player.getCentre().getX(),Player.getCentre().getY(),0.0f),
 										Player.getDirection(), 0));
+			playSound("res/audio/brawler_bullet.wav");
 		}		
 	}
 	
@@ -275,9 +366,22 @@ public class Model {
 		return texture;
 	}
 	
+//	private void playFootsteps() {
+//		if(footstep == null) {
+//			playSound("res/audio/hard-footstep1.wav");
+//			footstep = Instant.now();
+//		} else {
+//			Instant current = Instant.now();
+//			long timePassed = Duration.between(footstep, current).toMillis();
+//			if (timePassed > 5000) {
+//				playSound("res/audio/hard-footstep1.wav");
+//			}
+//		}
+//	}
+	
 	public void selectPlayer(int chosen) {
 		if(chosen == 0) {
-			Player = new Player("Archer", 2, 10, "res/Player/archer.png", 24, 24, new Point3f(96, 96, 0), 's');
+			Player = new Player("Archer", 2, 50, "res/Player/archer.png", 24, 24, new Point3f(96, 96, 0), 's');
 		}
 		else if(chosen == 1) {
 			Player = new Player("Witch", 3, 200, "res/Player/wizard.png", 24, 24, new Point3f(96, 96, 0), 's');
@@ -286,7 +390,12 @@ public class Model {
 			Player = new Player("Brawler", 1, 500, "res/Player/brawler.png", 24, 24, new Point3f(96, 96, 0), 's');
 		}
 	}
-
+	
+	public void playSound(String path) {
+		Sound effect = new Sound(path);
+		effect.play();
+	}
+	
 	public GameObject getPlayer() {
 		return Player;
 	}

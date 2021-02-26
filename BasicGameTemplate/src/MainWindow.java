@@ -46,14 +46,21 @@ SOFTWARE.
 
 
 public class MainWindow {
-	private static JFrame frame = new JFrame("Game");   // Change to the name of your game 
-	private static Model gameworld= new Model();
+	private static JFrame frame = new JFrame("The Cursed Caverns");   // Change to the name of your game 
+	private static Model gameworld = new Model();
 	private static Viewer canvas = new Viewer(gameworld);
-	private KeyListener Controller =new Controller(); 
+	private KeyListener Controller = new Controller(); 
+	
+	private static Sound startMenuMusic = new Sound("res/audio/start-menu.wav");
+	private static Sound inGameMusic = new Sound("res/audio/in-game-music.wav");
+	private static Sound gameOverMusic = new Sound("res/audio/game-over.wav");
+	private static Sound gameWonMusic = new Sound("res/audio/game-won.wav");
 	private static int TargetFPS = 100;
-	private static boolean startGame= false; 
+	private static boolean startGame = false; 
 	private static boolean inBeginning = false;
-	private JLabel BackgroundImageForStartMenu ;
+	private static boolean gameOver = false;
+	private static boolean gameWon = false;
+	private JLabel BackgroundImageForStartMenu;
 	  
 	public MainWindow() {
 		frame.setSize(1024, 1072);  // you can customise this later and adapt it to change on size.  
@@ -64,7 +71,6 @@ public class MainWindow {
 		canvas.setBackground(new Color(255,255,255)); //white background  replaced by Space background but if you remove the background method this will draw a white screen 
 		canvas.setVisible(false);   // this will become visible after you press the key. 
 		          
-		       
 	    JButton startMenuButton = new JButton("Start Game");  // start button 
 	    startMenuButton.addActionListener(new ActionListener() { 
 	    	@Override
@@ -76,6 +82,7 @@ public class MainWindow {
 	            canvas.requestFocusInWindow();   // making sure that the Canvas is in focus so keyboard input will be taking in .
 				startGame=true;
 				inBeginning = true;
+				startMenuMusic.stop();
 			}
 	    });  
 	    startMenuButton.setBounds(367, 693, 266, 55); 
@@ -92,15 +99,49 @@ public class MainWindow {
 		}   
 		 
         frame.add(startMenuButton);  
-        frame.setVisible(true);   
+        frame.setVisible(true);  
 	}
 
 	public static void main(String[] args) {
 		MainWindow hello = new MainWindow();  //sets up environment 
-		while(true) { //not nice but remember we do just want to keep looping till the end.  // this could be replaced by a thread but again we want to keep things simple 
-		 
+		startMenuMusic.loop();
+		play();
+		if(gameOver) {
+			inGameMusic.stop();
+			gameOverMusic.loop();
+			File BackroundToLoad = new File("res/gameoverscreen.png");  //should work okay on OSX and Linux but check if you have issues depending your eclipse install or if your running this without an IDE 
+			try {
+				BufferedImage myPicture = ImageIO.read(BackroundToLoad);
+				JLabel gameOverScreen = new JLabel(new ImageIcon(myPicture));
+				gameOverScreen.setBounds(0, 0, 1024, 1024);
+				frame.add(gameOverScreen); 
+				canvas.setVisible(false);
+				gameOverScreen.setVisible(true);
+			} catch (IOException e) { 
+				e.printStackTrace();
+			}
+		}
+		
+		else if(gameWon) {
+			inGameMusic.stop();
+			gameWonMusic.loop();
+			File BackroundToLoad = new File("res/gamewonscreen.png");  //should work okay on OSX and Linux but check if you have issues depending your eclipse install or if your running this without an IDE 
+			try {
+				BufferedImage myPicture = ImageIO.read(BackroundToLoad);
+				JLabel gameWonScreen = new JLabel(new ImageIcon(myPicture));
+				gameWonScreen.setBounds(0, 0, 1024, 1024);
+				frame.add(gameWonScreen); 
+				canvas.setVisible(false);
+				gameWonScreen.setVisible(true);
+			} catch (IOException e) { 
+				e.printStackTrace();
+			}
+		}
+	} 
+	
+	public static void play() {
+		while(!gameOver && !gameWon) { 
 			//swing has timer class to help us time this but I'm writing my own, you can of course use the timer, but I want to set FPS and display it 
-			
 			int TimeBetweenFrames =  1000 / TargetFPS;
 			long FrameCheck = System.currentTimeMillis() + (long) TimeBetweenFrames; 
 			
@@ -116,40 +157,33 @@ public class MainWindow {
 																   JOptionPane.PLAIN_MESSAGE, icon, characters, characters[0]);
 				}
 				gameworld.selectPlayer(chosenCharacter);
+				JOptionPane.showMessageDialog(frame, "You need to escape. It's dangerous.");
+				JOptionPane.showMessageDialog(frame, "Find the key and get out of here.");
 				inBeginning = false;
+				inGameMusic.loop();
 			}
 			
-			if(startGame) {
+			if(startGame)
 				gameloop();
-			}
 			
 			if(gameworld.getHealth() == 0) {
 				System.out.println("Game over");
+				gameOver = true;
 			}
 			
 			//UNIT test to see if framerate matches 
 			UnitTests.CheckFrameRate(System.currentTimeMillis(),FrameCheck, TargetFPS);   
 		}
-	} 
+	}
 	
 	//Basic Model-View-Controller pattern 
-	private static void gameloop() { 
-		// GAMELOOP  
-		
-		// controller input  will happen on its own thread 
-		// So no need to call it explicitly 
-		
+	private static void gameloop() { 		
 		// model update   
 		gameworld.gamelogic();
+		
 		// view update 
-		
 		canvas.updateview(); 
-		
-		// Both these calls could be setup as  a thread but we want to simplify the game logic for you.  
-		//score update  
-		frame.setTitle("HP =  "+ gameworld.getHealth()); 
 	}
-
 }
 
 /*

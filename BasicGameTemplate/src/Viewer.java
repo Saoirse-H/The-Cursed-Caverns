@@ -1,4 +1,5 @@
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
@@ -105,6 +106,9 @@ public class Viewer extends JPanel {
 			drawEnemies((int) temp.getCentre().getX(), (int) temp.getCentre().getY(), (int) temp.getWidth(), (int) temp.getHeight(), temp.getTexture(), temp.getDirection(), g);	 
 		 
 	    }); 
+		
+		drawHealth(gameworld.getHealth(), g);
+		
 	}
 	
 	private void drawEnemies(int x, int y, int width, int height, String texture, char direction, Graphics g) {
@@ -220,12 +224,13 @@ public class Viewer extends JPanel {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} 
-		 
-		//g.drawImage(img, dx1, dy1, dx2, dy2, sx1, sy1, sx2, sy2, observer));
-		//Lighnting Png from https://opengameart.org/content/animated-spaceships  its 32x32 thats why I know to increament by 32 each time 
-		// Bullets from https://opengameart.org/forumtopic/tatermands-art 
-		// background image from https://www.needpix.com/photo/download/677346/space-stars-nebula-background-galaxy-universe-free-pictures-free-photos-free-images
-		
+	}
+	
+	private void drawHealth(int health, Graphics g) {
+		Font font = new Font("SansSerif", Font.PLAIN, 20);
+		g.setFont(font);
+		g.setColor(Color.white);
+		g.drawString("Health: " + health, 900, 20);
 	}
 		 
 	 

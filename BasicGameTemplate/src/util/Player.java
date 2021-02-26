@@ -17,19 +17,25 @@ public class Player extends GameObject {
 		this.fireRate = fireRate;
 	}
 
-	public void getArcherDamage(CopyOnWriteArrayList<GameObject> EnemiesList, CopyOnWriteArrayList<Bullet> BulletList) {
+	public boolean getArcherDamage(CopyOnWriteArrayList<GameObject> EnemiesList, CopyOnWriteArrayList<Bullet> BulletList, Map map) {
+		boolean bulletHit = false;
+		
 		for (GameObject temp : EnemiesList) {
 			for (GameObject Bullet : BulletList) {
 				if (Math.abs(temp.getCentre().getX() - Bullet.getCentre().getX()) < temp.getWidth() 
 					&& Math.abs(temp.getCentre().getY()- Bullet.getCentre().getY()) < temp.getHeight()) {
+					map.setEnemyTile(temp.getCentre(), 1);
 					EnemiesList.remove(temp);
 					BulletList.remove(Bullet);
+					bulletHit = true;
 				}
 			}
 		}
+		
+		return bulletHit;
 	}
 	
-	public boolean getWitchDamage(CopyOnWriteArrayList<GameObject> EnemiesList, CopyOnWriteArrayList<Bullet> BulletList) {
+	public boolean getWitchDamage(CopyOnWriteArrayList<GameObject> EnemiesList, CopyOnWriteArrayList<Bullet> BulletList, Map map) {
 		boolean bulletHit = false;
 		Point3f bulletCentre = new Point3f();
 		
@@ -37,6 +43,7 @@ public class Player extends GameObject {
 			for (GameObject bullet : BulletList) {
 				if (Math.abs(temp.getCentre().getX() - bullet.getCentre().getX()) < temp.getWidth() 
 					&& Math.abs(temp.getCentre().getY()- bullet.getCentre().getY()) < temp.getHeight()) {
+					map.setEnemyTile(temp.getCentre(), 1);
 					EnemiesList.remove(temp);
 					bulletCentre = bullet.getCentre();
 					bulletHit = true;
@@ -47,28 +54,35 @@ public class Player extends GameObject {
 		
 		if(bulletHit) {
 			for (GameObject temp : EnemiesList) {
-				if(temp.getCentre().distance(bulletCentre) <= 100)
+				if(temp.getCentre().distance(bulletCentre) <= 100) {
+					map.setEnemyTile(temp.getCentre(), 1);
 					EnemiesList.remove(temp);
+				}
 			}
 		}
 		
 		return bulletHit;		
 	}
 	
-	public void getBrawlerDamage(CopyOnWriteArrayList<GameObject> EnemiesList, CopyOnWriteArrayList<Bullet> BulletList) {
+	public boolean getBrawlerDamage(CopyOnWriteArrayList<GameObject> EnemiesList, CopyOnWriteArrayList<Bullet> BulletList, Map map) {
+		boolean bulletHit = false;
 		
 		for (GameObject temp : EnemiesList) {
 			for (Bullet bullet : BulletList) {
 				if (Math.abs(temp.getCentre().getX() - bullet.getCentre().getX()) < temp.getWidth() 
 					&& Math.abs(temp.getCentre().getY()- bullet.getCentre().getY()) < temp.getHeight()) {
+					map.setEnemyTile(temp.getCentre(), 1);
 					EnemiesList.remove(temp);
 					bullet.setEnemiesHit(bullet.getEnemiesHit()+1);
+					bulletHit = true;
 					
 					if(bullet.getEnemiesHit() >= 3)
 						BulletList.remove(bullet);
 				}
 			}
 		}
+		
+		return bulletHit;
 	}
 
 	public String getRole() {
