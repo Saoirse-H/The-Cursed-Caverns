@@ -166,13 +166,36 @@ public class MainWindow {
 			if(startGame)
 				gameloop();
 			
+			//Check if game over
 			if(gameworld.getHealth() == 0) {
 				System.out.println("Game over");
 				gameOver = true;
 			}
 			
-			//UNIT test to see if framerate matches 
-			UnitTests.CheckFrameRate(System.currentTimeMillis(),FrameCheck, TargetFPS);   
+			//Check if opened chest without a key
+			if(gameworld.getCheckedChestWithoutKey()) {
+				JOptionPane.showMessageDialog(frame, "The key doesn't seem to be here...");
+			}
+			
+			//Check if opened chest with key
+			if(gameworld.getCheckedChestWithKey()) {
+				ImageIcon icon = new ImageIcon("res/key.png");
+				JOptionPane.showMessageDialog(frame, "You found the key!", "Key found!", JOptionPane.PLAIN_MESSAGE, icon);
+			}
+			
+			//Check if tried to open door with no key
+			if(gameworld.getCheckedDoor() && !gameworld.getPlayer().getHasKey()) {
+				JOptionPane.showMessageDialog(frame, "You can't open the door... Look for the key.");
+			}
+			
+			//Check if opened door with key
+			if(gameworld.getCheckedDoor() && gameworld.getPlayer().getHasKey()) {
+				JOptionPane.showMessageDialog(frame, "You unlocked the door!");
+				gameWon = true;
+			}
+			
+			//UNIT test to see if frame rate matches 
+			//UnitTests.CheckFrameRate(System.currentTimeMillis(),FrameCheck, TargetFPS);   
 		}
 	}
 	

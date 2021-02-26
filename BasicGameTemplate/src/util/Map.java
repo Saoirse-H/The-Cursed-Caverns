@@ -1,9 +1,15 @@
 package util;
+
+import java.util.Random;
+
 public class Map {
 	/*
 	 * An array representation of the game's map
 	 * 0 = Represents walls. Players, bullets and enemies cannot cross these
 	 * 1 = Represents the path. The player, bullets and enemies can walk across this
+	 * 2 = Empty chest
+	 * 3 = Chest with key
+	 * 4 = Door
 	 */
 	private int[][] map = {
 						{ 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
@@ -15,8 +21,8 @@ public class Map {
 						{ 0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,1,1,1,1,1,1,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0 },
 						{ 0,0,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0 },
 						{ 0,0,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0 },
-						{ 0,0,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0 },
-						{ 0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0 },
+						{ 0,0,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,1,1,1,1,1,2,2,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0 },
+						{ 0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,2,2,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0 },
 						{ 0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0 },
 						{ 0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0 },
 						{ 0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0 },
@@ -48,8 +54,8 @@ public class Map {
 						{ 0,1,1,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,1,1,1,1,1,1,0,0,0,1,1,1,1,1,1,1,1,0,0,0,1,1,0,0,0,0,0,0,0,0,1,1,1,0 },
 						{ 0,1,1,0,0,0,0,1,1,1,1,1,1,1,1,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,1,1,1,1,1,1,1,1,0,0,0,1,1,0,0,0,0,0,0,0,0,1,1,1,0 },
 						{ 0,1,1,0,0,0,0,1,1,1,1,1,1,1,1,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,1,1,1,1,1,1,1,1,0,0,0,1,1,0,0,0,0,0,0,0,0,1,1,1,0 },
-						{ 0,1,1,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,1,1,1,1,1,1,1,1,0,0,0,1,1,0,0,0,0,0,0,0,0,1,1,1,0 },
-						{ 0,1,1,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,0 },
+						{ 0,1,1,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,1,1,1,2,2,1,1,1,0,0,0,1,1,0,0,0,0,0,0,0,0,1,1,1,0 },
+						{ 0,1,1,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,2,2,1,1,1,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,0 },
 						{ 0,1,1,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,0 },
 						{ 0,1,1,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
 						{ 0,1,1,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
@@ -61,8 +67,8 @@ public class Map {
 						{ 0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,0,0,0 },
 						{ 0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,0,0,0 },
 						{ 0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,0,0,0 },
-						{ 0,1,1,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0 },
-						{ 0,1,1,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0 },
+						{ 0,1,1,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,4,4,1,1,1,0,0,0 },
+						{ 0,1,1,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,4,4,1,1,1,0,0,0 },
 						{ 0,1,1,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,0,0,0 },
 						{ 0,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,0,0,0 },
 						{ 0,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,0,0,0 },
@@ -144,15 +150,40 @@ public class Map {
 					{ 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1 },
 					{ 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1 }
 				};
+	private boolean chestWithKey;
+	private boolean chestWithoutKey;
+	private boolean door;
 	
-	public Map() {}
-	
-	private int getCol(float coordinate) {
-		return (int) coordinate/16;
+	public Map() {
+		chestWithKey = false;
+		chestWithoutKey = false;
+		door = false;
+		
+		Random r = new Random();
+		int key = r.nextInt(2);
+		System.out.println(key);
+		//assigning key to a chest
+		if(key == 0) {
+			map[9][47] = 3;
+			map[9][48] = 3;
+			map[10][47] = 3;
+			map[10][48] = 3;			
+		} else if(key == 1) {
+			map[43][42] = 3;
+			map[43][43] = 3;
+			map[42][42] = 3;
+			map[42][43] = 3;
+		}	
+		System.out.println(map[9][47] + "," +  map[9][48]);
+		System.out.println(map[43][42]+ "," + map[43][42]);
 	}
 	
-	private int getRow(float coordinate) {
-		return (int) coordinate/16;
+	private int getCol(Point3f point) {
+		return (int) point.getX()/16;
+	}
+	
+	private int getRow(Point3f point) {
+		return (int) point.getY()/16;
 	}
 	
 	public int[][] getMap() {
@@ -164,37 +195,75 @@ public class Map {
 	}
 	
 	public int getTile(Point3f point) {
-		return map[getRow(point.getY())][getCol(point.getX())];
+		return map[getRow(point)][getCol(point)];
 	}
 	
 	public int getEnemyTile(Point3f point) {
-		return enemyMap[getRow(point.getY())][getCol(point.getX())];
+		return enemyMap[getRow(point)][getCol(point)];
 	}
 	
 	public void setEnemyTile(Point3f point, int value) {
-		enemyMap[getRow(point.getY())][getCol(point.getX())] = value;
+		enemyMap[getRow(point)][getCol(point)] = value;
 	}
 	
-	public Boolean checkTile(Point3f point, Vector3f movement) {
+	public boolean getChestWithKey() {
+		return chestWithKey;
+	}
+	
+	public boolean getChestWithoutKey() {
+		return chestWithoutKey;
+	}
+	
+	public boolean getDoor() {
+		return door;
+	}
+	
+	public void setChestWithKey(boolean chestWithKey) {
+		this.chestWithKey = chestWithKey;
+	}
+	
+	public void setChestWithoutKey(boolean chestWithoutKey) {
+		this.chestWithoutKey = chestWithoutKey;
+	}
+	
+	public void setDoor(boolean door) {
+		this.door = door;
+	}
+	
+	public Boolean isMoveableTile(GameObject object, Vector3f movement) {
 		boolean validTile = false;
-		Point3f newCentre = point.checkVector(movement);
+		Point3f newCentre = object.getCentre().checkVector(movement);
 		
-		if(getTile(newCentre) != 0) {
+		if(getTile(newCentre) == 1) {
 			validTile = true;
 		}
+		else if(getTile(newCentre) == 2 && object.getClass() == Player.class) {
+			setChestWithoutKey(true);
+		}
+		else if(getTile(newCentre) == 3 && object.getClass() == Player.class) {
+			setChestWithKey(true);
+		}
+		else if(getTile(newCentre) == 4 && object.getClass() == Player.class) {
+			setDoor(true);
+		}
+		
 		return validTile;
 	}
 	
-	public Boolean checkEnemyTile(Point3f point, Vector3f movement) {
+	public Boolean isTileOccupied(GameObject enemy, Vector3f movement) {
 		boolean validTile = false;
-		Point3f newCentre = point.checkVector(movement);
+		Point3f oldCentre = enemy.getCentre();
+		Point3f newCentre = oldCentre.checkVector(movement);
+		
+		if((getRow(oldCentre) == getRow(newCentre)) && (getCol(oldCentre) == getCol(newCentre)))
+			validTile = true;
 		
 		if(getEnemyTile(newCentre) != 0)
 			validTile = true;
 		
-		if((getRow(point.getY()) == getRow(newCentre.getY())) && (getCol(point.getX()) == getCol(point.getX())))
-			validTile = true;
+		
 		
 		return validTile;
 	}
+	
 }

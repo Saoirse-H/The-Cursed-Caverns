@@ -49,7 +49,7 @@ SOFTWARE.
 public class Viewer extends JPanel {
 	private long CurrentAnimationTime= 0; 
 	
-	Model gameworld = new Model(); 
+	Model gameworld;
 	 
 	public Viewer(Model World) {
 		this.gameworld = World;
@@ -108,6 +108,9 @@ public class Viewer extends JPanel {
 	    }); 
 		
 		drawHealth(gameworld.getHealth(), g);
+		
+		if(gameworld.getPlayer().getHasKey())
+			drawKey(g);
 		
 	}
 	
@@ -221,7 +224,6 @@ public class Viewer extends JPanel {
 			}
 			g.drawImage(myImage, x,y, x+width, y+height, xFrame, yFrame, xFrame+31, yFrame+32, null); 
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} 
 	}
@@ -231,6 +233,16 @@ public class Viewer extends JPanel {
 		g.setFont(font);
 		g.setColor(Color.white);
 		g.drawString("Health: " + health, 900, 20);
+	}
+	
+	private void drawKey(Graphics g) {
+		File textureToLoad = new File("res/key.png");
+		try {
+			Image myImage = ImageIO.read(textureToLoad);
+			g.drawImage(myImage, 890, 10, 930, 60, 0, 0, 16, 16, null);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 		 
 	 

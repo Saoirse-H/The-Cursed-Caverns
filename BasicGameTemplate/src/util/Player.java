@@ -7,6 +7,7 @@ public class Player extends GameObject {
 	private String role;
 	private int health;
 	private long fireRate;
+	private boolean hasKey;
 	
 	public Player() {}
 	
@@ -15,6 +16,7 @@ public class Player extends GameObject {
 		this.role = role;
 		this.health = health;
 		this.fireRate = fireRate;
+		hasKey = false;
 	}
 
 	public boolean getArcherDamage(CopyOnWriteArrayList<GameObject> EnemiesList, CopyOnWriteArrayList<Bullet> BulletList, Map map) {
@@ -95,5 +97,13 @@ public class Player extends GameObject {
 	
 	public long getFireRate() {
 		return fireRate;
+	}
+	
+	public boolean getHasKey() {
+		return hasKey;
+	}
+	
+	public void setHasKey(boolean hasKey) {
+		this.hasKey = hasKey;
 	}
 }

@@ -2,13 +2,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
 import java.util.concurrent.CopyOnWriteArrayList;
-
-import javax.sound.sampled.AudioInputStream;
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.Clip;
-
 import java.time.Instant;
-import java.io.File;
 import java.time.Duration;
 
 import util.*; 
@@ -45,8 +39,10 @@ public class Model {
 	private Map map = new Map();
 	private int health = 100; 
 	private static Instant createdBullet = null;
-	private static Instant footstep = null;
-	private boolean drawFire = false;
+	
+	private boolean checkedChestWithKey = false;
+	private boolean checkedChestWithoutKey = false;
+	private boolean checkedDoor = false;
 
 	public Model() {
 		//setup game world 
@@ -60,15 +56,17 @@ public class Model {
 	public void gamelogic() {		
 		// Player Logic first 
 		playerLogic(); 
+		// Check if any player events have happened
+		playerEvents();
 		// Enemy Logic next
 		enemyLogic();
 		// Bullets move next 
 		bulletLogic();
 		// interactions between objects 
-		gameLogic();  
+		isEnemyHit();  
 	}
 
-	private void gameLogic() {
+	private void isEnemyHit() {
 		boolean hit = false;
 		
 		if(Player.getRole() == "Archer") {
@@ -89,10 +87,10 @@ public class Model {
 	
 	private void placeEnemies() {		
 		//room 1
-		while(enemyPlacement.size() < 10) {
+		while(enemyPlacement.size() < 20) {
 			Point3f enemy = new Point3f(((float) Math.random() * 176) + 672, ((float) Math.random() * 128) + 96, 0);
-			if(!enemyPlacement.containsKey(enemy.toString()) && map.checkEnemyTile(enemy, new Vector3f(0,0,0))) {
-				GameObject temp = new GameObject(enemyTexture(), 24, 24, enemy, 's');
+			GameObject temp = new GameObject(enemyTexture(), 24, 24, enemy, 's');
+			if(!enemyPlacement.containsKey(enemy.toString()) && map.isTileOccupied(temp, new Vector3f(0,0,0))) {
 				enemyPlacement.put(enemy.toString(), temp);
 				EnemiesList.add(temp);
 				map.setEnemyTile(temp.getCentre(), 0);
@@ -101,10 +99,10 @@ public class Model {
 		enemyPlacement.clear();
 		
 		//room 2
-		while(enemyPlacement.size() < 10) {
+		while(enemyPlacement.size() < 20) {
 			Point3f enemy = new Point3f(((float) Math.random() * 144) + 832, ((float) Math.random() * 112) + 816, 0);
-			if(!enemyPlacement.containsKey(enemy.toString()) && map.checkEnemyTile(enemy, new Vector3f(0,0,0))) {
-				GameObject temp = new GameObject(enemyTexture(), 24, 24, enemy, 's');
+			GameObject temp = new GameObject(enemyTexture(), 24, 24, enemy, 's');
+			if(!enemyPlacement.containsKey(enemy.toString()) && map.isTileOccupied(temp, new Vector3f(0,0,0))) {
 				enemyPlacement.put(enemy.toString(), temp);
 				EnemiesList.add(temp);
 				map.setEnemyTile(temp.getCentre(), 0);
@@ -113,10 +111,10 @@ public class Model {
 		enemyPlacement.clear();
 		
 		//room 3
-		while(enemyPlacement.size() < 10) {
+		while(enemyPlacement.size() < 20) {
 			Point3f enemy = new Point3f(((float) Math.random() * 112) + 628, (((float) Math.random() * 112) + 670), 0);
-			if(!enemyPlacement.containsKey(enemy.toString()) && map.checkEnemyTile(enemy, new Vector3f(0,0,0))) {
-				GameObject temp = new GameObject(enemyTexture(), 24, 24, enemy, 's');
+			GameObject temp = new GameObject(enemyTexture(), 24, 24, enemy, 's');
+			if(!enemyPlacement.containsKey(enemy.toString()) && map.isTileOccupied(temp, new Vector3f(0,0,0))) {
 				enemyPlacement.put(enemy.toString(), temp);
 				EnemiesList.add(temp);
 				map.setEnemyTile(temp.getCentre(), 0);
@@ -126,152 +124,157 @@ public class Model {
 	}
 
 	private void enemyLogic() {
-		for (GameObject temp : EnemiesList) {
+		for (GameObject enemy : EnemiesList) {
 		    // Move enemies 
 			// Move left towards player
-			if((int) temp.getCentre().getX() > (int) Player.getCentre().getX()) {
-				if(map.checkTile(temp.getCentre(), new Vector3f(-1, 0, 0)) && map.checkEnemyTile(temp.getCentre(), new Vector3f(-1, 0, 0))) {
-					map.setEnemyTile(temp.getCentre(), 1);
-					temp.getCentre().ApplyVector(new Vector3f(-1, 0, 0));
-					map.setEnemyTile(temp.getCentre(), 0);
+			if((int) enemy.getCentre().getX() > (int) Player.getCentre().getX()) {
+				Vector3f direction = new Vector3f(-1, 0, 0);
+				if(map.isMoveableTile(enemy, direction) && map.isTileOccupied(enemy, direction)) {
+					map.setEnemyTile(enemy.getCentre(), 1);
+					enemy.getCentre().ApplyVector(direction);
+					map.setEnemyTile(enemy.getCentre(), 0);
 				}
 				
-				temp.setDirection('a');
+				enemy.setDirection('a');
 			} 
 			// Move right towards player
-			else if((int) temp.getCentre().getX() < (int) Player.getCentre().getX()) {
-				if(map.checkTile(temp.getCentre(), new Vector3f(1, 0, 0)) && map.checkEnemyTile(temp.getCentre(), new Vector3f(1, 0, 0))) {
-					map.setEnemyTile(temp.getCentre(), 1);
-					temp.getCentre().ApplyVector(new Vector3f(1, 0, 0));
-					map.setEnemyTile(temp.getCentre(), 0);
+			else if((int) enemy.getCentre().getX() < (int) Player.getCentre().getX()) {
+				Vector3f direction = new Vector3f(1, 0, 0);
+				if(map.isMoveableTile(enemy, direction) && map.isTileOccupied(enemy, direction)) {
+					map.setEnemyTile(enemy.getCentre(), 1);
+					enemy.getCentre().ApplyVector(direction);
+					map.setEnemyTile(enemy.getCentre(), 0);
 				}
 				
-				temp.setDirection('d');
+				enemy.setDirection('d');
 			}
 			
 			// Move up towards the player
-			if((int) temp.getCentre().getY() > (int) Player.getCentre().getY()) {
-				if(map.checkTile(temp.getCentre(), new Vector3f(0, 1, 0)) && map.checkEnemyTile(temp.getCentre(), new Vector3f(0, 1, 0))) {
-					map.setEnemyTile(temp.getCentre(), 1);
-					temp.getCentre().ApplyVector(new Vector3f(0, 1, 0));
-					map.setEnemyTile(temp.getCentre(), 0);
+			if((int) enemy.getCentre().getY() > (int) Player.getCentre().getY()) {
+				Vector3f direction = new Vector3f(0, 1, 0);
+				if(map.isMoveableTile(enemy, direction) && map.isTileOccupied(enemy, direction)) {
+					map.setEnemyTile(enemy.getCentre(), 1);
+					enemy.getCentre().ApplyVector(direction);
+					map.setEnemyTile(enemy.getCentre(), 0);
 				}
 				
-				temp.setDirection('w');
+				enemy.setDirection('w');
 			} 
 			// Move down towards the player
-			else if((int) temp.getCentre().getY() < (int) Player.getCentre().getY()) {
-				if(map.checkTile(temp.getCentre(), new Vector3f(0, -1, 0)) && map.checkEnemyTile(temp.getCentre(), new Vector3f(0, -1, 0))) {
-					map.setEnemyTile(temp.getCentre(), 1);
-					temp.getCentre().ApplyVector(new Vector3f(0, -1, 0));
-					map.setEnemyTile(temp.getCentre(), 0);
+			else if((int) enemy.getCentre().getY() < (int) Player.getCentre().getY()) {
+				Vector3f direction = new Vector3f(0, -1, 0);
+				if(map.isMoveableTile(enemy, direction) && map.isTileOccupied(enemy, direction)) {
+					map.setEnemyTile(enemy.getCentre(), 1);
+					enemy.getCentre().ApplyVector(direction);
+					map.setEnemyTile(enemy.getCentre(), 0);
 				}
-				temp.setDirection('s');
+				
+				enemy.setDirection('s');
 			}
 						 
 			//see if they collide with the player
-			if (Math.abs(temp.getCentre().getX() - Player.getCentre().getX()) < temp.getWidth() 
-				&& Math.abs(temp.getCentre().getY()- Player.getCentre().getY()) < temp.getHeight()) {
+			if (Math.abs(enemy.getCentre().getX() - Player.getCentre().getX()) < enemy.getWidth() 
+				&& Math.abs(enemy.getCentre().getY()- Player.getCentre().getY()) < enemy.getHeight()) {
 					health = ((health - Player.gethealth()) < 0) ? 0 : health - Player.gethealth();
 					
 					//Check direction the enemy game from
-					switch(temp.getDirection()) {
+					switch(enemy.getDirection()) {
 						case 'a':
-							temp.getCentre().ApplyVector(new Vector3f(32, 0, 0));
+							map.setEnemyTile(enemy.getCentre(), 1);
+							enemy.getCentre().ApplyVector(new Vector3f(32, 0, 0));
+							map.setEnemyTile(enemy.getCentre(), 0);
 							break;
 						case 'd':
-							temp.getCentre().ApplyVector(new Vector3f(-32, 0, 0));
+							map.setEnemyTile(enemy.getCentre(), 1);
+							enemy.getCentre().ApplyVector(new Vector3f(-32, 0, 0));
+							map.setEnemyTile(enemy.getCentre(), 0);
 							break;
 						case 'w':
-							temp.getCentre().ApplyVector(new Vector3f(0, -32, 0));
+							map.setEnemyTile(enemy.getCentre(), 1);
+							enemy.getCentre().ApplyVector(new Vector3f(0, -32, 0));
+							map.setEnemyTile(enemy.getCentre(), 0);
 							break;
 						case 's':
-							temp.getCentre().ApplyVector(new Vector3f(0, 32, 0));
+							map.setEnemyTile(enemy.getCentre(), 1);
+							enemy.getCentre().ApplyVector(new Vector3f(0, 32, 0));
+							map.setEnemyTile(enemy.getCentre(), 0);
 							break;
 					}
-				}
+			}
 		}
 		
-		if (EnemiesList.size()<2) {
+		if (EnemiesList.size()<20) {
 			placeEnemies();
 		}
 	}
 
 	private void bulletLogic() {
 		// move bullets 
-		for (GameObject temp : BulletList) {
+		for (GameObject bullet : BulletList) {
 		    //check to move them
-			if(temp.getDirection() == 'a') {
-				if(map.checkTile(temp.getCentre(), new Vector3f(-3,0,0)))
-					temp.getCentre().ApplyVector(new Vector3f(-3,0,0));
+			if(bullet.getDirection() == 'a') {
+				if(map.isMoveableTile(bullet, new Vector3f(-3,0,0)))
+					bullet.getCentre().ApplyVector(new Vector3f(-3,0,0));
 				else
-					BulletList.remove(temp);
+					BulletList.remove(bullet);
 			}
-			else if(temp.getDirection() == 'd') {
-				if(map.checkTile(temp.getCentre(), new Vector3f(3,0,0)))
-					temp.getCentre().ApplyVector(new Vector3f(3,0,0));
+			else if(bullet.getDirection() == 'd') {
+				if(map.isMoveableTile(bullet, new Vector3f(3,0,0)))
+					bullet.getCentre().ApplyVector(new Vector3f(3,0,0));
 				else
-					BulletList.remove(temp);
+					BulletList.remove(bullet);
 			}
-			else if(temp.getDirection() == 'w') {
-				if(map.checkTile(temp.getCentre(), new Vector3f(0,3,0)))
-					temp.getCentre().ApplyVector(new Vector3f(0,3,0));
+			else if(bullet.getDirection() == 'w') {
+				if(map.isMoveableTile(bullet, new Vector3f(0,3,0)))
+					bullet.getCentre().ApplyVector(new Vector3f(0,3,0));
 				else
-					BulletList.remove(temp);
+					BulletList.remove(bullet);
 			}
-			else if(temp.getDirection() == 's') {
-				if(map.checkTile(temp.getCentre(), new Vector3f(0,-3,0)))
-					temp.getCentre().ApplyVector(new Vector3f(0,-3,0));
+			else if(bullet.getDirection() == 's') {
+				if(map.isMoveableTile(bullet, new Vector3f(0,-3,0)))
+					bullet.getCentre().ApplyVector(new Vector3f(0,-3,0));
 				else
-					BulletList.remove(temp);
+					BulletList.remove(bullet);
 			} 
 		} 
-		
 	}
 
 	private void playerLogic() {
-		
-		// smoother animation is possible if we make a target position  // done but may try to change things for students  
 		//check for movement and if you fired a bullet 
-		  
-		if(Controller.getInstance().isKeyAPressed()) {
+		if(controller.isKeyAPressed()) {
 			//Check if player can move to that tile
-			if(map.checkTile(Player.getCentre(), new Vector3f(-1,0,0)))
+			if(map.isMoveableTile(Player, new Vector3f(-1,0,0)))
 				Player.getCentre().ApplyVector( new Vector3f(-1,0,0)); 
 			
 			Player.setDirection('a');
-//			playFootsteps();
 		}
 		
-		if(Controller.getInstance().isKeyDPressed()) {
+		if(controller.isKeyDPressed()) {
 			//Check if player can move to that tile
-			if(map.checkTile(Player.getCentre(), new Vector3f(1,0,0)))
+			if(map.isMoveableTile(Player, new Vector3f(1,0,0)))
 				Player.getCentre().ApplyVector( new Vector3f(1,0,0));
 			
 			Player.setDirection('d');
-//			playFootsteps();
 		}
 			
-		if(Controller.getInstance().isKeyWPressed()) {
+		if(controller.isKeyWPressed()) {
 			//Check if player can move to that tile
-			if(map.checkTile(Player.getCentre(), new Vector3f(0,1,0)))
+			if(map.isMoveableTile(Player, new Vector3f(0,1,0)))
 				Player.getCentre().ApplyVector( new Vector3f(0,1,0));
 			
 			Player.setDirection('w');
-//			playFootsteps();
 		}
 		
-		if(Controller.getInstance().isKeySPressed()) {
+		if(controller.isKeySPressed()) {
 			//Check if player can move to that tile
-			if(map.checkTile(Player.getCentre(), new Vector3f(0,-1,0)))
+			if(map.isMoveableTile(Player, new Vector3f(0,-1,0)))
 				Player.getCentre().ApplyVector( new Vector3f(0,-1,0));
 			
 			Player.setDirection('s');
-//			playFootsteps();
 		}
 		
 
-		if(Controller.getInstance().isKeySpacePressed()) {
+		if(controller.isKeySpacePressed()) {
 			if (createdBullet == null) {
 				CreateBullet();
 				createdBullet = Instant.now();
@@ -283,40 +286,77 @@ public class Model {
 					createdBullet = Instant.now();
 				}
 			}
-			Controller.getInstance().setKeySpacePressed(false);
+			controller.setKeySpacePressed(false);
 		} 
 		
-		if(Controller.getInstance().isKeyShiftAPressed()) {
-			if(map.checkTile(Player.getCentre(), new Vector3f(-1,0,0)))
+		if(controller.isKeyShiftAPressed()) {
+			if(map.isMoveableTile(Player, new Vector3f(-1,0,0)))
 				Player.getCentre().ApplyVector( new Vector3f(-1,0,0));
 			
 			Player.setDirection('d');
-//			playFootsteps();
 		}
 		
-		if(Controller.getInstance().isKeyShiftDPressed()) {
-			if(map.checkTile(Player.getCentre(), new Vector3f(1,0,0)))
+		if(controller.isKeyShiftDPressed()) {
+			if(map.isMoveableTile(Player, new Vector3f(1,0,0)))
 				Player.getCentre().ApplyVector( new Vector3f(1,0,0));
 			
 			Player.setDirection('a');
-//			playFootsteps();
 		}
 		
-		if(Controller.getInstance().isKeyShiftWPressed()) {
-			if(map.checkTile(Player.getCentre(), new Vector3f(0,1,0)))
+		if(controller.isKeyShiftWPressed()) {
+			if(map.isMoveableTile(Player, new Vector3f(0,1,0)))
 				Player.getCentre().ApplyVector( new Vector3f(0,1,0));
 			
 			Player.setDirection('s');
-//			playFootsteps();
 		}
 		
-		if(Controller.getInstance().isKeyShiftSPressed()) {
-			if(map.checkTile(Player.getCentre(), new Vector3f(0,-1,0)))
+		if(controller.isKeyShiftSPressed()) {
+			if(map.isMoveableTile(Player	, new Vector3f(0,-1,0)))
 				Player.getCentre().ApplyVector( new Vector3f(0,-1,0));
 			
 			Player.setDirection('w');
-//			playFootsteps();
 		}		
+	}
+	
+	private void playerEvents() {
+		boolean eventHappened = false;
+		checkedChestWithKey = false;
+		checkedChestWithoutKey = false;
+		checkedDoor = false;
+		
+		//Check if chest with key was accessed
+		if(map.getChestWithKey()) {
+			checkedChestWithKey = true;
+			Player.setHasKey(true);
+			map.setChestWithKey(false);
+			playSound("res/audio/key-get.wav");
+			eventHappened = true;
+		}
+		
+		//Check if chest without key was accessed
+		if(map.getChestWithoutKey()) {
+			checkedChestWithoutKey = true;
+			map.setChestWithoutKey(false);
+			eventHappened = true;
+		}
+		
+		//Check if door was accessed
+		if(map.getDoor()) {
+			checkedDoor = true;
+			map.setDoor(false);
+			eventHappened = true;
+		}	
+		
+		if(eventHappened) {
+			controller.setKeyAPressed(false);
+			controller.setKeySPressed(false);
+			controller.setKeyDPressed(false);
+			controller.setKeyWPressed(false);
+			controller.setKeyShiftAPressed(false);
+			controller.setKeyShiftSPressed(false);
+			controller.setKeyShiftDPressed(false);
+			controller.setKeyShiftWPressed(false);
+		}
 	}
 
 	private void CreateBullet() {
@@ -335,6 +375,11 @@ public class Model {
 										Player.getDirection(), 0));
 			playSound("res/audio/brawler_bullet.wav");
 		}		
+	}
+	
+	private void playSound(String path) {
+		Sound effect = new Sound(path);
+		effect.play();
 	}
 	
 	private String enemyTexture() {
@@ -366,19 +411,6 @@ public class Model {
 		return texture;
 	}
 	
-//	private void playFootsteps() {
-//		if(footstep == null) {
-//			playSound("res/audio/hard-footstep1.wav");
-//			footstep = Instant.now();
-//		} else {
-//			Instant current = Instant.now();
-//			long timePassed = Duration.between(footstep, current).toMillis();
-//			if (timePassed > 5000) {
-//				playSound("res/audio/hard-footstep1.wav");
-//			}
-//		}
-//	}
-	
 	public void selectPlayer(int chosen) {
 		if(chosen == 0) {
 			Player = new Player("Archer", 2, 50, "res/Player/archer.png", 24, 24, new Point3f(96, 96, 0), 's');
@@ -391,12 +423,7 @@ public class Model {
 		}
 	}
 	
-	public void playSound(String path) {
-		Sound effect = new Sound(path);
-		effect.play();
-	}
-	
-	public GameObject getPlayer() {
+	public Player getPlayer() {
 		return Player;
 	}
 
@@ -412,8 +439,16 @@ public class Model {
 		return health;
 	}
 	
-	public boolean getDrawFire() {
-		return drawFire;
+	public boolean getCheckedChestWithKey() {
+		return checkedChestWithKey;
+	}
+	
+	public boolean getCheckedChestWithoutKey() {
+		return checkedChestWithoutKey;
+	}
+	
+	public boolean getCheckedDoor() {
+		return checkedDoor;
 	}
 }
 
