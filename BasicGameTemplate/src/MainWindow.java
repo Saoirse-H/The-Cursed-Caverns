@@ -1,9 +1,6 @@
-import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -14,9 +11,6 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-
-import util.UnitTests;
 
 /*
  * Created by Abraham Campbell on 15/01/2020.
@@ -46,10 +40,10 @@ SOFTWARE.
 
 
 public class MainWindow {
-	private static JFrame frame = new JFrame("The Cursed Caverns");   // Change to the name of your game 
+	private static JFrame frame = new JFrame("The Cursed Caverns");
 	private static Model gameworld = new Model();
 	private static Viewer canvas = new Viewer(gameworld);
-	private KeyListener Controller = new Controller(); 
+	private Controller Controller = new Controller(); 
 	
 	private static Sound startMenuMusic = new Sound("res/audio/start-menu.wav");
 	private static Sound inGameMusic = new Sound("res/audio/in-game-music.wav");
@@ -63,12 +57,12 @@ public class MainWindow {
 	private JLabel BackgroundImageForStartMenu;
 	  
 	public MainWindow() {
-		frame.setSize(1024, 1072);  // you can customise this later and adapt it to change on size.  
-	    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);   //If exit // you can modify with your way of quitting , just is a template.
+		frame.setSize(1024, 1072);
+	    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	    frame.setLayout(null);
 	    frame.add(canvas);  
 	    canvas.setBounds(0, 0, 1024, 1024); 
-		canvas.setBackground(new Color(255,255,255)); //white background  replaced by Space background but if you remove the background method this will draw a white screen 
+		canvas.setBackground(new Color(255,255,255));
 		canvas.setVisible(false);   // this will become visible after you press the key. 
 		          
 	    JButton startMenuButton = new JButton("Start Game");  // start button 
@@ -79,16 +73,17 @@ public class MainWindow {
 				BackgroundImageForStartMenu.setVisible(false); 
 				canvas.setVisible(true); 
 				canvas.addKeyListener(Controller);    //adding the controller to the Canvas  
+				canvas.addMouseListener(Controller);
 	            canvas.requestFocusInWindow();   // making sure that the Canvas is in focus so keyboard input will be taking in .
 				startGame=true;
 				inBeginning = true;
 				startMenuMusic.stop();
 			}
 	    });  
-	    startMenuButton.setBounds(367, 693, 266, 55); 
+	    startMenuButton.setBounds(369, 735, 284, 58); 
 	        
         //loading background image 
-        File BackroundToLoad = new File("res/startscreen.png");  //should work okay on OSX and Linux but check if you have issues depending your eclipse install or if your running this without an IDE 
+        File BackroundToLoad = new File("res/startscreen.png");
 		try {
 			BufferedImage myPicture = ImageIO.read(BackroundToLoad);
 			BackgroundImageForStartMenu = new JLabel(new ImageIcon(myPicture));
@@ -106,10 +101,11 @@ public class MainWindow {
 		MainWindow hello = new MainWindow();  //sets up environment 
 		startMenuMusic.loop();
 		play();
+		
 		if(gameOver) {
 			inGameMusic.stop();
 			gameOverMusic.loop();
-			File BackroundToLoad = new File("res/gameoverscreen.png");  //should work okay on OSX and Linux but check if you have issues depending your eclipse install or if your running this without an IDE 
+			File BackroundToLoad = new File("res/gameoverscreen.png");
 			try {
 				BufferedImage myPicture = ImageIO.read(BackroundToLoad);
 				JLabel gameOverScreen = new JLabel(new ImageIcon(myPicture));
@@ -125,7 +121,7 @@ public class MainWindow {
 		else if(gameWon) {
 			inGameMusic.stop();
 			gameWonMusic.loop();
-			File BackroundToLoad = new File("res/gamewonscreen.png");  //should work okay on OSX and Linux but check if you have issues depending your eclipse install or if your running this without an IDE 
+			File BackroundToLoad = new File("res/gamewonscreen.png");
 			try {
 				BufferedImage myPicture = ImageIO.read(BackroundToLoad);
 				JLabel gameWonScreen = new JLabel(new ImageIcon(myPicture));
@@ -150,7 +146,7 @@ public class MainWindow {
 			
 			if(inBeginning) {
 				Object[] characters = {"Archer", "Witch", "Brawler"};
-				ImageIcon icon = new ImageIcon("res/hooded-figure.png");
+				ImageIcon icon = new ImageIcon("res/hoodedfigure.png");
 				int chosenCharacter = -1;
 				while(chosenCharacter == -1) {	
 					chosenCharacter = JOptionPane.showOptionDialog(frame, "Please choose a player:", "Who are you?", JOptionPane.DEFAULT_OPTION, 
@@ -159,8 +155,11 @@ public class MainWindow {
 				gameworld.selectPlayer(chosenCharacter);
 				JOptionPane.showMessageDialog(frame, "You need to escape. It's dangerous.");
 				JOptionPane.showMessageDialog(frame, "Find the key and get out of here.");
-				inBeginning = false;
 				inGameMusic.loop();
+				JLabel lbl = new JLabel(new ImageIcon(("res/controlhelp.png")));
+			    JOptionPane.showMessageDialog(frame, lbl, "Controls", 
+			                                 JOptionPane.PLAIN_MESSAGE, null);
+				inBeginning = false;
 			}
 			
 			if(startGame)
@@ -192,10 +191,7 @@ public class MainWindow {
 			if(gameworld.getCheckedDoor() && gameworld.getPlayer().getHasKey()) {
 				JOptionPane.showMessageDialog(frame, "You unlocked the door!");
 				gameWon = true;
-			}
-			
-			//UNIT test to see if frame rate matches 
-			//UnitTests.CheckFrameRate(System.currentTimeMillis(),FrameCheck, TargetFPS);   
+			}  
 		}
 	}
 	

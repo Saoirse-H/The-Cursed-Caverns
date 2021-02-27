@@ -1,23 +1,18 @@
+/*
+ * Saoirse Houlihan
+ * 17340803
+ */
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.LayoutManager;
-import java.awt.Rectangle;
-import java.awt.TexturePaint;
-import java.awt.image.BufferedImage;
-import java.awt.RenderingHints;
-import java.awt.geom.AffineTransform;
 import java.io.File;
 import java.io.IOException;
-import java.util.Iterator;
-
 import javax.imageio.ImageIO;
 import javax.swing.JPanel;
-import javax.swing.Timer;
 
-import util.GameObject;
+import util.*;
 
 
 /*
@@ -47,33 +42,30 @@ SOFTWARE.
  * Credits: Kelly Charles (2020)
  */ 
 public class Viewer extends JPanel {
+	private static final long serialVersionUID = 1L;
+
 	private long CurrentAnimationTime= 0; 
 	
 	Model gameworld;
 	 
-	public Viewer(Model World) {
-		this.gameworld = World;
-		// TODO Auto-generated constructor stub
+	public Viewer(Model world) {
+		this.gameworld = world;
 	}
 
 	public Viewer(LayoutManager layout) {
 		super(layout);
-		// TODO Auto-generated constructor stub
 	}
 
 	public Viewer(boolean isDoubleBuffered) {
 		super(isDoubleBuffered);
-		// TODO Auto-generated constructor stub
 	}
 
 	public Viewer(LayoutManager layout, boolean isDoubleBuffered) {
 		super(layout, isDoubleBuffered);
-		// TODO Auto-generated constructor stub
 	}
 
 	public void updateview() {
 		this.repaint();
-		// TODO Auto-generated method stub
 	}
 	
 	public void paintComponent(Graphics g) {
@@ -81,37 +73,32 @@ public class Viewer extends JPanel {
 		super.paintComponent(g);
 		CurrentAnimationTime++; // runs animation time step 
 		
-		//Draw player Game Object 
-		int x = (int) gameworld.getPlayer().getCentre().getX();
-		int y = (int) gameworld.getPlayer().getCentre().getY();
-		int width = (int) gameworld.getPlayer().getWidth();
-		int height = (int) gameworld.getPlayer().getHeight();
-		String texture = gameworld.getPlayer().getTexture();
-		char playerDirection = gameworld.getPlayer().getDirection();
+		Player player = gameworld.getPlayer();
 		
 		//Draw background 
 		drawBackground(g);
 		
 		//Draw player
-		drawPlayer(x, y, width, height, texture, playerDirection,g);
+		drawPlayer(	(int) player.getCentre().getX(), (int) player.getCentre().getY(), (int) player.getWidth(),
+					(int) player.getHeight(), player.getTexture(), player.getDirection(), g);
 		  
 		//Draw Bullets 
-		// change back 
-		gameworld.getBullets().forEach((temp) -> { 
-			drawBullet((int) temp.getCentre().getX(), (int) temp.getCentre().getY(), (int) temp.getWidth(), (int) temp.getHeight(), temp.getTexture(), temp.getDirection(), g);	 
+		gameworld.getBullets().forEach((bullet) -> { 
+			drawBullet(	(int) bullet.getCentre().getX(), (int) bullet.getCentre().getY(), (int) bullet.getWidth(), 
+						(int) bullet.getHeight(), bullet.getTexture(), bullet.getDirection(), g);	 
 		}); 
 		
 		//Draw Enemies   
-		gameworld.getEnemies().forEach((temp) -> {
-			drawEnemies((int) temp.getCentre().getX(), (int) temp.getCentre().getY(), (int) temp.getWidth(), (int) temp.getHeight(), temp.getTexture(), temp.getDirection(), g);	 
+		gameworld.getEnemies().forEach((enemy) -> {
+			drawEnemies((int) enemy.getCentre().getX(), (int) enemy.getCentre().getY(), (int) enemy.getWidth(), 
+						(int) enemy.getHeight(), enemy.getTexture(), enemy.getDirection(), g);	 
 		 
 	    }); 
 		
+		//Draw UI
 		drawHealth(gameworld.getHealth(), g);
-		
-		if(gameworld.getPlayer().getHasKey())
+		if(player.getHasKey())
 			drawKey(g);
-		
 	}
 	
 	private void drawEnemies(int x, int y, int width, int height, String texture, char direction, Graphics g) {
@@ -135,21 +122,15 @@ public class Viewer extends JPanel {
 					break;
 			}
 			g.drawImage(myImage, x,y, x+width, y+height, xFrame, yFrame, xFrame + (myImage.getWidth(null)/3), yFrame + (myImage.getHeight(null)/4), null); 	
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} 
+		} catch (IOException e) { e.printStackTrace(); } 
 	}
 
 	private void drawBackground(Graphics g) {
-		File TextureToLoad = new File("res/map1.png");  //should work okay on OSX and Linux but check if you have issues depending your eclipse install or if your running this without an IDE 
+		File TextureToLoad = new File("res/map.png");  //should work okay on OSX and Linux but check if you have issues depending your eclipse install or if your running this without an IDE 
 		try {
 			Image myImage = ImageIO.read(TextureToLoad); 
 			 g.drawImage(myImage, 0,0, 1024, 1024, 0 , 0, 1024, 1024, null); 
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		} catch (IOException e) { e.printStackTrace(); }
 	}
 	
 	private void drawBullet(int x, int y, int width, int height, String texture, char direction, Graphics g) {
@@ -190,13 +171,7 @@ public class Viewer extends JPanel {
 				xframe = (int) ((CurrentAnimationTime%4) * ((myImage.getWidth(null))/4));
 				g.drawImage(myImage, x, y, x+width, y+width, xframe, 0, xframe + (myImage.getWidth(null)/4), yframe, null);
 			}
-				
-	        
-	        
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		} catch (IOException e) { e.printStackTrace(); }
 	}	
 
 	private void drawPlayer(int x, int y, int width, int height, String texture, char direction, Graphics g) { 
@@ -205,7 +180,6 @@ public class Viewer extends JPanel {
 			Image myImage = ImageIO.read(TextureToLoad);
 			
 			//The sprite is 32x32 pixel wide, with 4 rows and 3 columns in each row
-			
 			int xFrame = ((int) ((CurrentAnimationTime%15)/5))*32; //slows down animation so every 5 frames we get another frame so every 50ms 
 			int yFrame = 0;
 			switch(direction) {
@@ -244,9 +218,6 @@ public class Viewer extends JPanel {
 			e.printStackTrace();
 		}
 	}
-		 
-	 
-
 }
 
 

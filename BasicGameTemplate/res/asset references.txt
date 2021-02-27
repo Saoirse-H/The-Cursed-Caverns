@@ -1,0 +1,36 @@
+Enemy Sprites from https://beowulf.itch.io/freebosseswalkingsprites
+
+Hero Sprites from https://pipoya.itch.io/pipoya-free-rpg-character-sprites-32x32?download
+Archer = Male/Male 03-1.png
+Witch = Female/Female 09-1.png
+Brawler = Female/Female 10-4.png
+
+Character selection icon from https://game-icons.net/1x1/darkzaitzev/hooded-figure.html#download
+
+Witch bullet from https://opengameart.org/content/bubble-explosion, (bubble_explo2.png)
+
+Archer arrows from https://opengameart.org/content/rotating-arrow-projectile
+
+Brawler axe from https://opengameart.org/content/axes-pixel-art, (3.png)
+
+Game Won background from https://opengameart.org/content/background-and-cliffs-from-springs-spring (bg1.png)
+
+Tresure Chest on start screen from https://seliel-the-shaper.itch.io/treasure-chests
+
+Map tileset from https://pixel-poem.itch.io/dungeon-assetpuck (character and tileset/Dungeon_Tileset.png)
+
+Wasd and mouse icons from https://opengameart.org/content/arrow-keys-wsad-mouse-icon
+
+Shift icon from https://opengameart.org/content/shift-key-commando-anim-deers
+
+witch-bullet.wav from https://opengameart.org/content/8-bit-sound-effect-pack (blast.wav)
+brawler-bullet.wav from https://opengameart.org/content/8-bit-sound-effect-pack (spinning_toss.wav)
+archer-bullet.wav from https://opengameart.org/content/8-bit-sound-effect-pack (tinywarble.wav)
+punch.wav from https://opengameart.org/content/8-bit-sound-effect-pack (punch.wav)
+
+start-menu.wav from from https://opengameart.org/content/generic-8-bit-jrpg-soundtrack (03 - HWV 56 - Why do the nations so furiously rage together)
+in-game-music.wav from https://opengameart.org/content/generic-8-bit-jrpg-soundtrack (13 - Danger)
+game-over.wav from https://opengameart.org/content/generic-8-bit-jrpg-soundtrack (20 - Game Over)
+game-won.wav from https://opengameart.org/content/generic-8-bit-jrpg-soundtrack (25 - Finale)
+
+key-get.wav from https://opengameart.org/content/level-up-power-up-coin-get-13-sounds (Rise02.aif)

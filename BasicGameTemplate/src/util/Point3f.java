@@ -1,4 +1,8 @@
-package util;
+/*
+ * Saoirse Houlihan
+ * 17340803
+ */
+ package util;
 /*
  * Modified by Abraham Campbell on 15/01/2020.
  *   Copyright (c) 2020  Abraham Campbell
@@ -25,7 +29,6 @@ SOFTWARE.
  */ 
 //Modified from Graphics 3033J course point class  by Abey Campbell 
 
-
 public class Point3f {
 
 	private float x;
@@ -47,10 +50,6 @@ public class Point3f {
 		this.setY(y);
 		this.setZ(z); 
 	}
-	
-	private void setBoundary(int boundary) {
-		this.boundary = boundary;	
-	}
 
 	// sometimes for different algorithms we will need to address the point using positions 0 1 2 
 	public float getPostion(int postion)
@@ -71,20 +70,16 @@ public class Point3f {
 		return ("(" + getX() +"," + getY() +"," + getZ() +")");
     }
 
-	//implement Point plus a Vector and comment what the method does 
-	public Point3f PlusVector(Vector3f Additonal) { 
-		return new Point3f(this.getX()+Additonal.getX(), this.getY()+Additonal.getY(), this.getZ()+Additonal.getZ());
+	public Point3f plusVector(Vector3f additonal) { 
+		return new Point3f(this.getX()+additonal.getX(), this.getY()+additonal.getY(), this.getZ()+additonal.getZ());
 	} 
 	
-	//implement Point minus a Vector and comment what the method does 
-	public Point3f MinusVector(Vector3f Minus) { 
-		return new Point3f(this.getX()-Minus.getX(), this.getY()-Minus.getY(), this.getZ()-Minus.getZ());
+	public Point3f minusVector(Vector3f minus) { 
+		return new Point3f(this.getX()-minus.getX(), this.getY()-minus.getY(), this.getZ()-minus.getZ());
 	}
 	
-	
-	//implement Point - Point  and comment what the method does  
-	public Vector3f MinusPoint(Point3f Minus) { 
-		return new Vector3f(this.getX()-Minus.getX(), this.getY()-Minus.getY(), this.getZ()-Minus.getZ());
+	public Vector3f minusPoint(Point3f minus) { 
+		return new Vector3f(this.getX()-minus.getX(), this.getY()-minus.getY(), this.getZ()-minus.getZ());
 	}
 	
 	public double distance(Point3f point2) {
@@ -95,27 +90,28 @@ public class Point3f {
 		double distance = Math.sqrt(xDistance + yDistance);
 		return distance;
 	}
-	 
+	
 	public Point3f checkVector(Vector3f vector) {
-		float newX = CheckBoundary(this.getX()+vector.getX());
-		float newY = CheckBoundary(this.getY()-vector.getY());
-		float newZ = CheckBoundary(this.getZ()-vector.getZ());
+		float newX = checkBoundary(this.getX() + vector.getX());
+		float newY = checkBoundary(this.getY() - vector.getY());
+		float newZ = checkBoundary(this.getZ() - vector.getZ());
 		
 		return new Point3f(newX, newY, newZ);
 	}
+	
 	//Use for direct application of a Vector 
-	public void ApplyVector(Vector3f vector) { 
-		setX(CheckBoundary(this.getX()+vector.getX()));
-		setY(CheckBoundary(this.getY()-vector.getY()));
-		setZ(CheckBoundary(this.getZ()-vector.getZ())); 
+	public void applyVector(Vector3f vector) { 
+		setX(checkBoundary(this.getX() + vector.getX()));
+		setY(checkBoundary(this.getY() - vector.getY()));
+		setZ(checkBoundary(this.getZ() - vector.getZ())); 
 	}
 
-	private float CheckBoundary(float f) {
-		if (f<0) 
-			f=0.0f;
+	private float checkBoundary(float f) {
+		if (f < 0) 
+			f = 0.0f;
 		
-		if (f>boundary)
-			f=(float) boundary;
+		if (f > boundary)
+			f = (float) boundary;
 		
 		return f;
 	}

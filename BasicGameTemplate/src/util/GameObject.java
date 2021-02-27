@@ -1,3 +1,7 @@
+/*
+ * Saoirse Houlihan
+ * 17340803
+ */
 package util;
 /*
  * Created by Abraham Campbell on 15/01/2020.
@@ -25,14 +29,13 @@ SOFTWARE.
  */ 
 public class GameObject {
 	
-	private Point3f centre = new Point3f(0,0,0);			// Centre of object, using 3D as objects may be scaled  
+	private Point3f centre = new Point3f(0,0,0);	// Centre of object, using 3D as objects may be scaled  
 	private int width = 10;
 	private int height = 10;
 	private boolean hasTextured = false;
 	private String textureLocation; 
 	private String blanktexture = "res/blank.png";
 	private char direction;
-	private boolean beenHit = false;
 	
 	public GameObject() { }
 	
@@ -51,7 +54,6 @@ public class GameObject {
 
 	public void setCentre(Point3f centre) {
 		this.centre = centre;
-		//make sure to put boundaries on the gameObject 
 	}
 
 	public int getWidth() {
@@ -80,14 +82,6 @@ public class GameObject {
 	
 	public void setDirection(char direction) {
 		this.direction = direction;
-	}
-	
-	public boolean getBeenHit() {
-		return beenHit;
-	}
-	
-	public void setBeenHit(boolean beenHit) {
-		this.beenHit = beenHit;
 	}
 }
 

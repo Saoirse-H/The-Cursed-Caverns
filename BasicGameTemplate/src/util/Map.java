@@ -1,7 +1,14 @@
+/* 
+ * Written by Saoirse Houlihan
+ * 17340803
+ */
 package util;
 
 import java.util.Random;
-
+/* 
+ * Inspired by Nick Benevento's LevelMaker.java available here: 
+ * https://github.com/NickBenevento/ucd_game_development/blob/master/project1/BasicGameTemplate/src/LevelMaker.java
+ */
 public class Map {
 	/*
 	 * An array representation of the game's map
@@ -161,7 +168,6 @@ public class Map {
 		
 		Random r = new Random();
 		int key = r.nextInt(2);
-		System.out.println(key);
 		//assigning key to a chest
 		if(key == 0) {
 			map[9][47] = 3;
@@ -173,9 +179,7 @@ public class Map {
 			map[43][43] = 3;
 			map[42][42] = 3;
 			map[42][43] = 3;
-		}	
-		System.out.println(map[9][47] + "," +  map[9][48]);
-		System.out.println(map[43][42]+ "," + map[43][42]);
+		}
 	}
 	
 	private int getCol(Point3f point) {
@@ -260,8 +264,6 @@ public class Map {
 		
 		if(getEnemyTile(newCentre) != 0)
 			validTile = true;
-		
-		
 		
 		return validTile;
 	}

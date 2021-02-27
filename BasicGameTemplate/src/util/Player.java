@@ -1,3 +1,7 @@
+/* 
+ * Written by Saoirse Houlihan
+ * 17340803
+ */
 package util;
 
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -7,6 +11,7 @@ public class Player extends GameObject {
 	private String role;
 	private int health;
 	private long fireRate;
+	private long invincibilityTimer;
 	private boolean hasKey;
 	
 	public Player() {}
@@ -17,17 +22,18 @@ public class Player extends GameObject {
 		this.health = health;
 		this.fireRate = fireRate;
 		hasKey = false;
+		invincibilityTimer = 0;
 	}
 
-	public boolean getArcherDamage(CopyOnWriteArrayList<GameObject> EnemiesList, CopyOnWriteArrayList<Bullet> BulletList, Map map) {
+	public boolean getArcherDamage(CopyOnWriteArrayList<Enemy> EnemiesList, CopyOnWriteArrayList<Bullet> BulletList, Map map) {
 		boolean bulletHit = false;
 		
-		for (GameObject temp : EnemiesList) {
-			for (GameObject Bullet : BulletList) {
-				if (Math.abs(temp.getCentre().getX() - Bullet.getCentre().getX()) < temp.getWidth() 
-					&& Math.abs(temp.getCentre().getY()- Bullet.getCentre().getY()) < temp.getHeight()) {
-					map.setEnemyTile(temp.getCentre(), 1);
-					EnemiesList.remove(temp);
+		for (Enemy enemy : EnemiesList) {
+			for (Bullet Bullet : BulletList) {
+				if (Math.abs(enemy.getCentre().getX() - Bullet.getCentre().getX()) < enemy.getWidth() 
+					&& Math.abs(enemy.getCentre().getY()- Bullet.getCentre().getY()) < enemy.getHeight()) {
+					map.setEnemyTile(enemy.getCentre(), 1);
+					EnemiesList.remove(enemy);
 					BulletList.remove(Bullet);
 					bulletHit = true;
 				}
@@ -37,16 +43,16 @@ public class Player extends GameObject {
 		return bulletHit;
 	}
 	
-	public boolean getWitchDamage(CopyOnWriteArrayList<GameObject> EnemiesList, CopyOnWriteArrayList<Bullet> BulletList, Map map) {
+	public boolean getWitchDamage(CopyOnWriteArrayList<Enemy> EnemiesList, CopyOnWriteArrayList<Bullet> BulletList, Map map) {
 		boolean bulletHit = false;
 		Point3f bulletCentre = new Point3f();
 		
-		for (GameObject temp : EnemiesList) {
-			for (GameObject bullet : BulletList) {
-				if (Math.abs(temp.getCentre().getX() - bullet.getCentre().getX()) < temp.getWidth() 
-					&& Math.abs(temp.getCentre().getY()- bullet.getCentre().getY()) < temp.getHeight()) {
-					map.setEnemyTile(temp.getCentre(), 1);
-					EnemiesList.remove(temp);
+		for (Enemy enemy : EnemiesList) {
+			for (Bullet bullet : BulletList) {
+				if (Math.abs(enemy.getCentre().getX() - bullet.getCentre().getX()) < enemy.getWidth() 
+					&& Math.abs(enemy.getCentre().getY()- bullet.getCentre().getY()) < enemy.getHeight()) {
+					map.setEnemyTile(enemy.getCentre(), 1);
+					EnemiesList.remove(enemy);
 					bulletCentre = bullet.getCentre();
 					bulletHit = true;
 					BulletList.remove(bullet);
@@ -55,10 +61,10 @@ public class Player extends GameObject {
 		}
 		
 		if(bulletHit) {
-			for (GameObject temp : EnemiesList) {
-				if(temp.getCentre().distance(bulletCentre) <= 100) {
-					map.setEnemyTile(temp.getCentre(), 1);
-					EnemiesList.remove(temp);
+			for (Enemy enemy : EnemiesList) {
+				if(enemy.getCentre().distance(bulletCentre) <= 48) {
+					map.setEnemyTile(enemy.getCentre(), 1);
+					EnemiesList.remove(enemy);
 				}
 			}
 		}
@@ -66,15 +72,15 @@ public class Player extends GameObject {
 		return bulletHit;		
 	}
 	
-	public boolean getBrawlerDamage(CopyOnWriteArrayList<GameObject> EnemiesList, CopyOnWriteArrayList<Bullet> BulletList, Map map) {
+	public boolean getBrawlerDamage(CopyOnWriteArrayList<Enemy> EnemiesList, CopyOnWriteArrayList<Bullet> BulletList, Map map) {
 		boolean bulletHit = false;
 		
-		for (GameObject temp : EnemiesList) {
+		for (Enemy enemy : EnemiesList) {
 			for (Bullet bullet : BulletList) {
-				if (Math.abs(temp.getCentre().getX() - bullet.getCentre().getX()) < temp.getWidth() 
-					&& Math.abs(temp.getCentre().getY()- bullet.getCentre().getY()) < temp.getHeight()) {
-					map.setEnemyTile(temp.getCentre(), 1);
-					EnemiesList.remove(temp);
+				if (Math.abs(enemy.getCentre().getX() - bullet.getCentre().getX()) < enemy.getWidth() 
+					&& Math.abs(enemy.getCentre().getY()- bullet.getCentre().getY()) < enemy.getHeight()) {
+					map.setEnemyTile(enemy.getCentre(), 1);
+					EnemiesList.remove(enemy);
 					bullet.setEnemiesHit(bullet.getEnemiesHit()+1);
 					bulletHit = true;
 					
@@ -91,7 +97,7 @@ public class Player extends GameObject {
 		return role;
 	}
 	
-	public int gethealth() {
+	public int getHealth() {
 		return health;
 	}
 	
@@ -105,5 +111,13 @@ public class Player extends GameObject {
 	
 	public void setHasKey(boolean hasKey) {
 		this.hasKey = hasKey;
+	}
+	
+	public long getInvincibilityTimer() {
+		return invincibilityTimer;
+	}
+	
+	public void setInvincibilityTimer(long invincibility) {
+		this.invincibilityTimer = invincibility;
 	}
 }

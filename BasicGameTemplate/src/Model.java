@@ -1,5 +1,7 @@
-import java.util.ArrayList;
-import java.util.HashMap;
+/*
+ * Saoirse Houlihan
+ * 17340803
+ */
 import java.util.Random;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.time.Instant;
@@ -33,9 +35,8 @@ SOFTWARE.
 public class Model {
 	private Player Player;
 	private Controller controller = Controller.getInstance();
-	private CopyOnWriteArrayList<GameObject> EnemiesList = new CopyOnWriteArrayList<GameObject>();
+	private CopyOnWriteArrayList<Enemy> EnemiesList = new CopyOnWriteArrayList<Enemy>();
 	private CopyOnWriteArrayList<Bullet> BulletList = new CopyOnWriteArrayList<Bullet>();
-	private HashMap<String, GameObject> enemyPlacement = new HashMap<String, GameObject>();
 	private Map map = new Map();
 	private int health = 100; 
 	private static Instant createdBullet = null;
@@ -64,6 +65,8 @@ public class Model {
 		bulletLogic();
 		// interactions between objects 
 		isEnemyHit();  
+		//update Player's invincibility timer
+		updateInvincibilityTimer();
 	}
 
 	private void isEnemyHit() {
@@ -85,125 +88,100 @@ public class Model {
 				
 	}
 	
-	private void placeEnemies() {		
+	private void placeEnemies() {	
+		int enemyCounter = 0;
 		//room 1
-		while(enemyPlacement.size() < 20) {
-			Point3f enemy = new Point3f(((float) Math.random() * 176) + 672, ((float) Math.random() * 128) + 96, 0);
-			GameObject temp = new GameObject(enemyTexture(), 24, 24, enemy, 's');
-			if(!enemyPlacement.containsKey(enemy.toString()) && map.isTileOccupied(temp, new Vector3f(0,0,0))) {
-				enemyPlacement.put(enemy.toString(), temp);
-				EnemiesList.add(temp);
-				map.setEnemyTile(temp.getCentre(), 0);
+		while(enemyCounter < 20) {
+			Point3f point = new Point3f(((float) Math.random() * 176) + 672, ((float) Math.random() * 128) + 96, 0);
+			Enemy enemy = new Enemy(enemyTexture(), 24, 24, point, 's');
+			
+			if(map.isTileOccupied(enemy, new Vector3f(0,0,0)) && map.isMoveableTile(enemy, new Vector3f(0,0,0))) {
+				EnemiesList.add(enemy);
+				map.setEnemyTile(enemy.getCentre(), 0);
+				enemyCounter += 1;
 			}
 		}
-		enemyPlacement.clear();
 		
+		enemyCounter = 0;
 		//room 2
-		while(enemyPlacement.size() < 20) {
-			Point3f enemy = new Point3f(((float) Math.random() * 144) + 832, ((float) Math.random() * 112) + 816, 0);
-			GameObject temp = new GameObject(enemyTexture(), 24, 24, enemy, 's');
-			if(!enemyPlacement.containsKey(enemy.toString()) && map.isTileOccupied(temp, new Vector3f(0,0,0))) {
-				enemyPlacement.put(enemy.toString(), temp);
-				EnemiesList.add(temp);
-				map.setEnemyTile(temp.getCentre(), 0);
+		while(enemyCounter< 20) {
+			Point3f point = new Point3f(((float) Math.random() * 144) + 832, ((float) Math.random() * 112) + 816, 0);
+			Enemy enemy = new Enemy(enemyTexture(), 24, 24, point, 's');
+			
+			if(map.isTileOccupied(enemy, new Vector3f(0,0,0)) && map.isMoveableTile(enemy, new Vector3f(0,0,0))) {
+				EnemiesList.add(enemy);
+				map.setEnemyTile(enemy.getCentre(), 0);
+				enemyCounter += 1;
 			}
 		}
-		enemyPlacement.clear();
 		
+		enemyCounter = 0;
 		//room 3
-		while(enemyPlacement.size() < 20) {
-			Point3f enemy = new Point3f(((float) Math.random() * 112) + 628, (((float) Math.random() * 112) + 670), 0);
-			GameObject temp = new GameObject(enemyTexture(), 24, 24, enemy, 's');
-			if(!enemyPlacement.containsKey(enemy.toString()) && map.isTileOccupied(temp, new Vector3f(0,0,0))) {
-				enemyPlacement.put(enemy.toString(), temp);
-				EnemiesList.add(temp);
-				map.setEnemyTile(temp.getCentre(), 0);
+		while(enemyCounter < 20) {
+			Point3f point = new Point3f(((float) Math.random() * 112) + 628, (((float) Math.random() * 112) + 670), 0);
+			Enemy enemy = new Enemy(enemyTexture(), 24, 24, point, 's');
+			
+			if(map.isTileOccupied(enemy, new Vector3f(0,0,0)) && map.isMoveableTile(enemy, new Vector3f(0,0,0))) {
+				EnemiesList.add(enemy);
+				map.setEnemyTile(enemy.getCentre(), 0);
+				enemyCounter += 1;
 			}
 		}
-		enemyPlacement.clear();
 	}
 
 	private void enemyLogic() {
-		for (GameObject enemy : EnemiesList) {
-		    // Move enemies 
+		for (Enemy enemy : EnemiesList) {
+		    // Move enemies
 			// Move left towards player
 			if((int) enemy.getCentre().getX() > (int) Player.getCentre().getX()) {
 				Vector3f direction = new Vector3f(-1, 0, 0);
-				if(map.isMoveableTile(enemy, direction) && map.isTileOccupied(enemy, direction)) {
-					map.setEnemyTile(enemy.getCentre(), 1);
-					enemy.getCentre().ApplyVector(direction);
-					map.setEnemyTile(enemy.getCentre(), 0);
-				}
 				
+				if(map.isMoveableTile(enemy, direction) && map.isTileOccupied(enemy, direction)) {
+					enemy.move(direction, map);
+				}
 				enemy.setDirection('a');
 			} 
 			// Move right towards player
 			else if((int) enemy.getCentre().getX() < (int) Player.getCentre().getX()) {
 				Vector3f direction = new Vector3f(1, 0, 0);
-				if(map.isMoveableTile(enemy, direction) && map.isTileOccupied(enemy, direction)) {
-					map.setEnemyTile(enemy.getCentre(), 1);
-					enemy.getCentre().ApplyVector(direction);
-					map.setEnemyTile(enemy.getCentre(), 0);
-				}
 				
+				if(map.isMoveableTile(enemy, direction) && map.isTileOccupied(enemy, direction)) {
+					enemy.move(direction, map);
+				}
 				enemy.setDirection('d');
 			}
 			
 			// Move up towards the player
 			if((int) enemy.getCentre().getY() > (int) Player.getCentre().getY()) {
 				Vector3f direction = new Vector3f(0, 1, 0);
-				if(map.isMoveableTile(enemy, direction) && map.isTileOccupied(enemy, direction)) {
-					map.setEnemyTile(enemy.getCentre(), 1);
-					enemy.getCentre().ApplyVector(direction);
-					map.setEnemyTile(enemy.getCentre(), 0);
-				}
 				
+				if(map.isMoveableTile(enemy, direction) && map.isTileOccupied(enemy, direction)) {
+					enemy.move(direction, map);
+				}				
 				enemy.setDirection('w');
 			} 
+			
 			// Move down towards the player
 			else if((int) enemy.getCentre().getY() < (int) Player.getCentre().getY()) {
 				Vector3f direction = new Vector3f(0, -1, 0);
-				if(map.isMoveableTile(enemy, direction) && map.isTileOccupied(enemy, direction)) {
-					map.setEnemyTile(enemy.getCentre(), 1);
-					enemy.getCentre().ApplyVector(direction);
-					map.setEnemyTile(enemy.getCentre(), 0);
-				}
 				
+				if(map.isMoveableTile(enemy, direction) && map.isTileOccupied(enemy, direction)) {
+					enemy.move(direction, map);
+				}
 				enemy.setDirection('s');
 			}
-						 
-			//see if they collide with the player
-			if (Math.abs(enemy.getCentre().getX() - Player.getCentre().getX()) < enemy.getWidth() 
-				&& Math.abs(enemy.getCentre().getY()- Player.getCentre().getY()) < enemy.getHeight()) {
-					health = ((health - Player.gethealth()) < 0) ? 0 : health - Player.gethealth();
-					
-					//Check direction the enemy game from
-					switch(enemy.getDirection()) {
-						case 'a':
-							map.setEnemyTile(enemy.getCentre(), 1);
-							enemy.getCentre().ApplyVector(new Vector3f(32, 0, 0));
-							map.setEnemyTile(enemy.getCentre(), 0);
-							break;
-						case 'd':
-							map.setEnemyTile(enemy.getCentre(), 1);
-							enemy.getCentre().ApplyVector(new Vector3f(-32, 0, 0));
-							map.setEnemyTile(enemy.getCentre(), 0);
-							break;
-						case 'w':
-							map.setEnemyTile(enemy.getCentre(), 1);
-							enemy.getCentre().ApplyVector(new Vector3f(0, -32, 0));
-							map.setEnemyTile(enemy.getCentre(), 0);
-							break;
-						case 's':
-							map.setEnemyTile(enemy.getCentre(), 1);
-							enemy.getCentre().ApplyVector(new Vector3f(0, 32, 0));
-							map.setEnemyTile(enemy.getCentre(), 0);
-							break;
-					}
+			
+			if(Player.getInvincibilityTimer() == 0) {
+				//see if they collide with the player
+				if (Math.abs(enemy.getCentre().getX() - Player.getCentre().getX()) < enemy.getWidth() 
+					&& Math.abs(enemy.getCentre().getY()- Player.getCentre().getY()) < enemy.getHeight()) {
+						health = ((health - Player.getHealth()) < 0) ? 0 : health - Player.getHealth();
+						Player.setInvincibilityTimer(10);
+				}
 			}
 		}
 		
-		if (EnemiesList.size()<20) {
+		if (EnemiesList.size() < 20) {
 			placeEnemies();
 		}
 	}
@@ -214,25 +192,25 @@ public class Model {
 		    //check to move them
 			if(bullet.getDirection() == 'a') {
 				if(map.isMoveableTile(bullet, new Vector3f(-3,0,0)))
-					bullet.getCentre().ApplyVector(new Vector3f(-3,0,0));
+					bullet.getCentre().applyVector(new Vector3f(-3,0,0));
 				else
 					BulletList.remove(bullet);
 			}
 			else if(bullet.getDirection() == 'd') {
 				if(map.isMoveableTile(bullet, new Vector3f(3,0,0)))
-					bullet.getCentre().ApplyVector(new Vector3f(3,0,0));
+					bullet.getCentre().applyVector(new Vector3f(3,0,0));
 				else
 					BulletList.remove(bullet);
 			}
 			else if(bullet.getDirection() == 'w') {
 				if(map.isMoveableTile(bullet, new Vector3f(0,3,0)))
-					bullet.getCentre().ApplyVector(new Vector3f(0,3,0));
+					bullet.getCentre().applyVector(new Vector3f(0,3,0));
 				else
 					BulletList.remove(bullet);
 			}
 			else if(bullet.getDirection() == 's') {
 				if(map.isMoveableTile(bullet, new Vector3f(0,-3,0)))
-					bullet.getCentre().ApplyVector(new Vector3f(0,-3,0));
+					bullet.getCentre().applyVector(new Vector3f(0,-3,0));
 				else
 					BulletList.remove(bullet);
 			} 
@@ -244,7 +222,7 @@ public class Model {
 		if(controller.isKeyAPressed()) {
 			//Check if player can move to that tile
 			if(map.isMoveableTile(Player, new Vector3f(-1,0,0)))
-				Player.getCentre().ApplyVector( new Vector3f(-1,0,0)); 
+				Player.getCentre().applyVector( new Vector3f(-1,0,0)); 
 			
 			Player.setDirection('a');
 		}
@@ -252,7 +230,7 @@ public class Model {
 		if(controller.isKeyDPressed()) {
 			//Check if player can move to that tile
 			if(map.isMoveableTile(Player, new Vector3f(1,0,0)))
-				Player.getCentre().ApplyVector( new Vector3f(1,0,0));
+				Player.getCentre().applyVector( new Vector3f(1,0,0));
 			
 			Player.setDirection('d');
 		}
@@ -260,7 +238,7 @@ public class Model {
 		if(controller.isKeyWPressed()) {
 			//Check if player can move to that tile
 			if(map.isMoveableTile(Player, new Vector3f(0,1,0)))
-				Player.getCentre().ApplyVector( new Vector3f(0,1,0));
+				Player.getCentre().applyVector( new Vector3f(0,1,0));
 			
 			Player.setDirection('w');
 		}
@@ -268,13 +246,40 @@ public class Model {
 		if(controller.isKeySPressed()) {
 			//Check if player can move to that tile
 			if(map.isMoveableTile(Player, new Vector3f(0,-1,0)))
-				Player.getCentre().ApplyVector( new Vector3f(0,-1,0));
+				Player.getCentre().applyVector( new Vector3f(0,-1,0));
 			
 			Player.setDirection('s');
 		}
 		
-
-		if(controller.isKeySpacePressed()) {
+		if(controller.isKeyShiftAPressed()) {
+			if(map.isMoveableTile(Player, new Vector3f(-1,0,0)))
+				Player.getCentre().applyVector( new Vector3f(-1,0,0));
+			
+			Player.setDirection('d');
+		}
+		
+		if(controller.isKeyShiftDPressed()) {
+			if(map.isMoveableTile(Player, new Vector3f(1,0,0)))
+				Player.getCentre().applyVector( new Vector3f(1,0,0));
+			
+			Player.setDirection('a');
+		}
+		
+		if(controller.isKeyShiftWPressed()) {
+			if(map.isMoveableTile(Player, new Vector3f(0,1,0)))
+				Player.getCentre().applyVector( new Vector3f(0,1,0));
+			
+			Player.setDirection('s');
+		}
+		
+		if(controller.isKeyShiftSPressed()) {
+			if(map.isMoveableTile(Player	, new Vector3f(0,-1,0)))
+				Player.getCentre().applyVector( new Vector3f(0,-1,0));
+			
+			Player.setDirection('w');
+		}	
+		
+		if(controller.isLeftClickPressed()) {
 			if (createdBullet == null) {
 				CreateBullet();
 				createdBullet = Instant.now();
@@ -286,36 +291,8 @@ public class Model {
 					createdBullet = Instant.now();
 				}
 			}
-			controller.setKeySpacePressed(false);
+			controller.setLeftClickPressed(false);
 		} 
-		
-		if(controller.isKeyShiftAPressed()) {
-			if(map.isMoveableTile(Player, new Vector3f(-1,0,0)))
-				Player.getCentre().ApplyVector( new Vector3f(-1,0,0));
-			
-			Player.setDirection('d');
-		}
-		
-		if(controller.isKeyShiftDPressed()) {
-			if(map.isMoveableTile(Player, new Vector3f(1,0,0)))
-				Player.getCentre().ApplyVector( new Vector3f(1,0,0));
-			
-			Player.setDirection('a');
-		}
-		
-		if(controller.isKeyShiftWPressed()) {
-			if(map.isMoveableTile(Player, new Vector3f(0,1,0)))
-				Player.getCentre().ApplyVector( new Vector3f(0,1,0));
-			
-			Player.setDirection('s');
-		}
-		
-		if(controller.isKeyShiftSPressed()) {
-			if(map.isMoveableTile(Player	, new Vector3f(0,-1,0)))
-				Player.getCentre().ApplyVector( new Vector3f(0,-1,0));
-			
-			Player.setDirection('w');
-		}		
 	}
 	
 	private void playerEvents() {
@@ -361,19 +338,19 @@ public class Model {
 
 	private void CreateBullet() {
 		if(Player.getRole() == "Witch") {
-			BulletList.add(new Bullet("res/Bullets/witch_bullet.png",31,31,new Point3f(Player.getCentre().getX(),Player.getCentre().getY(),0.0f), 
-										Player.getDirection(), 0));
-			playSound("res/audio/witch_bullet.wav");
+			BulletList.add(new Bullet(	"res/Bullets/witch-bullet.png", 31, 31, new Point3f(Player.getCentre().getX(), 
+										Player.getCentre().getY(), 0.0f), Player.getDirection(), 0));
+			playSound("res/audio/witch-bullet.wav");
 		} 
 		else if(Player.getRole() == "Archer") {
-			BulletList.add(new Bullet("res/Bullets/archer_bullets.png",31,31,new Point3f(Player.getCentre().getX(),Player.getCentre().getY(),0.0f),
-										Player.getDirection(), 0));
-			playSound("res/audio/archer_bullet.wav");
+			BulletList.add(new Bullet(	"res/Bullets/archer-bullets.png", 31, 31, new Point3f(Player.getCentre().getX(),
+										Player.getCentre().getY(), 0.0f), Player.getDirection(), 0));
+			playSound("res/audio/archer-bullet.wav");
 		} 
 		else if(Player.getRole() == "Brawler") {
-			BulletList.add(new Bullet("res/Bullets/brawler_bullets.png",31,31,new Point3f(Player.getCentre().getX(),Player.getCentre().getY(),0.0f),
-										Player.getDirection(), 0));
-			playSound("res/audio/brawler_bullet.wav");
+			BulletList.add(new Bullet(	"res/Bullets/brawler-bullets.png", 31, 31, new Point3f(Player.getCentre().getX(),
+										Player.getCentre().getY(), 0.0f), Player.getDirection(), 0));
+			playSound("res/audio/brawler-bullet.wav");
 		}		
 	}
 	
@@ -407,8 +384,16 @@ public class Model {
 				texture = "res/Enemy/wolves.png";
 				break;
 		}
-		
 		return texture;
+	}
+	
+	/*
+	 * Taken from Patashu's answer on https://stackoverflow.com/questions/16195406/setting-invincibility-frame-for-the-player
+	 */
+	private void updateInvincibilityTimer() {
+		if(Player.getInvincibilityTimer() != 0) {
+			Player.setInvincibilityTimer(Player.getInvincibilityTimer() - 1);
+		}
 	}
 	
 	public void selectPlayer(int chosen) {
@@ -416,7 +401,7 @@ public class Model {
 			Player = new Player("Archer", 2, 50, "res/Player/archer.png", 24, 24, new Point3f(96, 96, 0), 's');
 		}
 		else if(chosen == 1) {
-			Player = new Player("Witch", 3, 200, "res/Player/wizard.png", 24, 24, new Point3f(96, 96, 0), 's');
+			Player = new Player("Witch", 3, 200, "res/Player/witch.png", 24, 24, new Point3f(96, 96, 0), 's');
 		}
 		else if(chosen == 2) {
 			Player = new Player("Brawler", 1, 500, "res/Player/brawler.png", 24, 24, new Point3f(96, 96, 0), 's');
@@ -427,7 +412,7 @@ public class Model {
 		return Player;
 	}
 
-	public CopyOnWriteArrayList<GameObject> getEnemies() {
+	public CopyOnWriteArrayList<Enemy> getEnemies() {
 		return EnemiesList;
 	}
 	

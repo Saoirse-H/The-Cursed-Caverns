@@ -1,5 +1,8 @@
+/* 
+ * Written by Saoirse Houlihan
+ * 17340803
+ */
 package util;
-
 public class Bullet extends GameObject {
 	int enemiesHit = 0;
 	

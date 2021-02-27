@@ -1,3 +1,7 @@
+/*
+ * Saoirse Houlihan
+ * 17340803
+ */
 package util;
 /*
  * Modified by Abraham Campbell on 15/01/2020.
@@ -41,56 +45,47 @@ public class Vector3f {
 		this.setY(y);
 		this.setZ(z);
 	}
-	
-	//implement Vector plus a Vector  and comment what the method does  
-	public Vector3f PlusVector(Vector3f Additonal) { 
-		return new Vector3f(this.getX()+Additonal.getX(), this.getY()+Additonal.getY(), this.getZ()+Additonal.getZ());
+	 
+	public Vector3f plusVector(Vector3f additonal) { 
+		return new Vector3f(this.getX()+additonal.getX(), this.getY()+additonal.getY(), this.getZ()+additonal.getZ());
 	} 
 	
-	//implement Vector minus a Vector  and comment what the method does  
-	public Vector3f MinusVector(Vector3f Minus) { 
-		return new Vector3f(this.getX()-Minus.getX(), this.getY()-Minus.getY(), this.getZ()-Minus.getZ());
+	public Vector3f minusVector(Vector3f minus) { 
+		return new Vector3f(this.getX()-minus.getX(), this.getY()-minus.getY(), this.getZ()-minus.getZ());
 	}
-	
-	//implement Vector plus a Point and comment what the method does  
-	public Point3f PlusPoint(Point3f Additonal) { 
-		return new Point3f(this.getX()+Additonal.getX(), this.getY()+Additonal.getY(), this.getZ()+Additonal.getZ());
+	 
+	public Point3f plusPoint(Point3f additional) { 
+		return new Point3f(this.getX()+additional.getX(), this.getY()+additional.getY(), this.getZ()+additional.getZ());
 	} 
 	
-	//Do not implement Vector minus a Point as it is undefined 
-	
-	//Implement a Vector * Scalar  and comment what the method does    ( we wont create Scalar * Vector due to expediency ) 
-	public Vector3f byScalar(float scale ) {
+	public Vector3f byScalar(float scale) {
 		return new Vector3f(this.getX()*scale, this.getY()*scale, this.getZ()*scale);
 	}
-	
-	//implement returning the negative of a Vector  and comment what the method does  
-	public Vector3f  NegateVector() {
+	 
+	public Vector3f negateVector() {
 		return new Vector3f(-this.getX(), -this.getY(), -this.getZ());
 	}
 	
-	//implement getting the length of a Vector    and comment what the method does
 	public float length() {
-	    return (float) Math.sqrt(getX()*getX() + getY()*getY() + getZ()*getZ());
+		float length = (float) Math.sqrt(getX()*getX() + getY()*getY() + getZ()*getZ());
+	    return length;
 	}
 	
-	//implement getting the Normal  of a Vector   and comment what the method does
-	public Vector3f Normal() {
-		float LengthOfTheVector = this.length();
-		return this.byScalar(1.0f/ LengthOfTheVector); 
+	public Vector3f normal() {
+		float length = this.length();
+		return this.byScalar(1.0f/ length); 
 	} 
 	
-	//implement getting the dot product of Vector.Vector and comment what the method does 
 	public float dot(Vector3f v) { 
-		return ( this.getX()*v.getX() + this.getY()*v.getY() + this.getZ()*v.getZ());
+		float dotProduct = this.getX()*v.getX() + this.getY()*v.getY() + this.getZ()*v.getZ();
+		return dotProduct;
 	}
-	
-	//implement getting the cross product of Vector X Vector and comment what the method does  
+	 
 	public Vector3f cross(Vector3f v) { 
-	    float u0 = (this.getY()*v.getZ() - getZ()*v.getY());
-	    float u1 = (getZ()*v.getX() - getX()*v.getZ());
-	    float u2 = (getX()*v.getY() - getY()*v.getX());
-	    return new Vector3f(u0,u1,u2);
+	    float u0 = (this.getY() * v.getZ() - getZ() * v.getY());
+	    float u1 = (getZ() * v.getX() - getX() * v.getZ());
+	    float u2 = (getX() * v.getY() - getY() * v.getX());
+	    return new Vector3f(u0, u1, u2);
 	}
 
 	public float getX() {

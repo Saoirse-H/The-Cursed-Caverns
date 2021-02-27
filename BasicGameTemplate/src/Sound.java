@@ -1,9 +1,12 @@
+/*
+ * Written by Saoirse Houlihan
+ * 17340803
+ */
 import java.io.File;
 
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
-
 /*
  * Taken from:
  * https://stackoverflow.com/questions/11919009/using-javax-sound-sampled-clip-to-play-loop-and-stop-multiple-sounds-in-a-game

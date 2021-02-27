@@ -1,7 +1,11 @@
+/*
+ * Saoirse Houlihan
+ * 17340803
+ */
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 
 /*
  * Created by Abraham Campbell on 15/01/2020.
@@ -29,16 +33,16 @@ SOFTWARE.
  */ 
 
 //Singeton pattern
-public class Controller implements KeyListener { 
+public class Controller implements KeyListener, MouseListener { 
 	private static boolean KeyAPressed = false;
 	private static boolean KeySPressed = false;
 	private static boolean KeyDPressed = false;
 	private static boolean KeyWPressed = false;
-	private static boolean KeySpacePressed = false;
 	private static boolean KeyShiftAPressed = false;
 	private static boolean KeyShiftSPressed = false;
 	private static boolean KeyShiftDPressed = false;
 	private static boolean KeyShiftWPressed = false;
+	private static boolean LeftClickPressed = false;
 	   
 	private static final Controller instance = new Controller();
 	   
@@ -67,9 +71,6 @@ public class Controller implements KeyListener {
 			case 'd':
 				setKeyDPressed(true);
 				break;
-			case ' ':
-				setKeySpacePressed(true);
-				break;   
 			case 'A':
 				setKeyShiftAPressed(true);
 				break;
@@ -104,9 +105,6 @@ public class Controller implements KeyListener {
 			case 'd':
 				setKeyDPressed(false);
 				break;
-			case ' ':
-				setKeySpacePressed(false);
-				break;  
 			case 'A':
 				setKeyShiftAPressed(false);
 				break;
@@ -124,6 +122,34 @@ public class Controller implements KeyListener {
 		        break;
 		}  
 		 //upper case 
+	}
+	
+	@Override
+	public void mouseClicked(MouseEvent m) {}
+
+	@Override
+	public void mouseEntered(MouseEvent m) {}
+
+	@Override
+	public void mouseExited(MouseEvent m) {}
+
+	@Override
+	public void mousePressed(MouseEvent m) {
+		if(m.getButton() == MouseEvent.BUTTON1) {
+			setLeftClickPressed(true);
+		} else {
+			System.out.println("Controller test: Unknown mouse click pressed");
+		}
+		
+	}
+
+	@Override
+	public void mouseReleased(MouseEvent m) {
+		if(m.getButton() == MouseEvent.BUTTON1) {
+			setLeftClickPressed(false);
+		} else {
+			System.out.println("Controller test: Unknown mouse click released");
+		}
 	}
 
 
@@ -165,16 +191,6 @@ public class Controller implements KeyListener {
 	public void setKeyWPressed(boolean keyWPressed) {
 		KeyWPressed = keyWPressed;
 	}
-
-
-	public boolean isKeySpacePressed() {
-		return KeySpacePressed;
-	}
-
-
-	public void setKeySpacePressed(boolean keySpacePressed) {
-		KeySpacePressed = keySpacePressed;
-	} 
 	
 	public boolean isKeyShiftAPressed() {
 		return KeyShiftAPressed;
@@ -206,6 +222,14 @@ public class Controller implements KeyListener {
 	
 	public void setKeyShiftDPressed(boolean keyShiftDPressed) {
 		KeyShiftDPressed = keyShiftDPressed;
+	}
+	
+	public boolean isLeftClickPressed() {
+		return LeftClickPressed;
+	}
+	
+	public void setLeftClickPressed(boolean leftClickPressed) {
+		LeftClickPressed = leftClickPressed;
 	}
 }
 
