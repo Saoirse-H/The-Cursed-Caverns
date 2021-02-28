@@ -47,8 +47,16 @@ public class Viewer extends JPanel {
 	private long CurrentAnimationTime= 0; 
 	
 	Model gameworld;
+	private Image backgroundImage;
 	 
 	public Viewer(Model world) {
+		File TextureToLoad = new File("res/map.png"); 
+		try {
+			backgroundImage = ImageIO.read(TextureToLoad); 
+
+		} catch (IOException e) {
+			e.printStackTrace(); 
+		}
 		this.gameworld = world;
 	}
 
@@ -102,10 +110,10 @@ public class Viewer extends JPanel {
 	}
 	
 	private void drawEnemies(int x, int y, int width, int height, String texture, char direction, Graphics g) {
-		File TextureToLoad = new File(texture);  //should work okay on OSX and Linux but check if you have issues depending your eclipse install or if your running this without an IDE 
+		File TextureToLoad = new File(texture);
 		try {
 			Image myImage = ImageIO.read(TextureToLoad);
-			int xFrame = ((int) ((CurrentAnimationTime%9)/3)) * ((myImage.getWidth(null))/3); //slows down animation so every 3 frames we get another frame so every 50ms 
+			int xFrame = ((int) ((CurrentAnimationTime%9)/3)) * ((myImage.getWidth(null))/3); //slows down animation so every 3 frames we get another frame so every 30ms 
 			int yFrame = 0;
 			switch(direction) {
 				case 's':
@@ -126,15 +134,11 @@ public class Viewer extends JPanel {
 	}
 
 	private void drawBackground(Graphics g) {
-		File TextureToLoad = new File("res/map.png");  //should work okay on OSX and Linux but check if you have issues depending your eclipse install or if your running this without an IDE 
-		try {
-			Image myImage = ImageIO.read(TextureToLoad); 
-			 g.drawImage(myImage, 0,0, 1024, 1024, 0 , 0, 1024, 1024, null); 
-		} catch (IOException e) { e.printStackTrace(); }
+			 g.drawImage(backgroundImage, 0,0, 1024, 1024, 0 , 0, 1024, 1024, null); 
 	}
 	
 	private void drawBullet(int x, int y, int width, int height, String texture, char direction, Graphics g) {
-		File TextureToLoad = new File(texture);  //should work okay on OSX and Linux but check if you have issues depending your eclipse install or if your running this without an IDE 
+		File TextureToLoad = new File(texture);
 		try {
 			Image myImage = ImageIO.read(TextureToLoad); 
 			//64 by 128 
@@ -175,7 +179,7 @@ public class Viewer extends JPanel {
 	}	
 
 	private void drawPlayer(int x, int y, int width, int height, String texture, char direction, Graphics g) { 
-		File TextureToLoad = new File(texture);  //should work okay on OSX and Linux but check if you have issues depending your eclipse install or if your running this without an IDE 
+		File TextureToLoad = new File(texture);
 		try {
 			Image myImage = ImageIO.read(TextureToLoad);
 			

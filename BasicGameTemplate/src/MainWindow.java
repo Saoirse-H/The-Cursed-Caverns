@@ -87,7 +87,7 @@ public class MainWindow {
 		try {
 			BufferedImage myPicture = ImageIO.read(BackroundToLoad);
 			BackgroundImageForStartMenu = new JLabel(new ImageIcon(myPicture));
-			BackgroundImageForStartMenu.setBounds(0, 0, 1000, 1000);
+			BackgroundImageForStartMenu.setBounds(0, 0, 1024, 1024);
 			frame.add(BackgroundImageForStartMenu); 
 		} catch (IOException e) { 
 			e.printStackTrace();
