@@ -12,6 +12,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 
+import util.UnitTests;
 /*
  * Created by Abraham Campbell on 15/01/2020.
  *   Copyright (c) 2020  Abraham Campbell
@@ -43,7 +44,7 @@ public class MainWindow {
 	private static JFrame frame = new JFrame("The Cursed Caverns");
 	private static Model gameworld = new Model();
 	private static Viewer canvas = new Viewer(gameworld);
-	private Controller Controller = new Controller(); 
+	private Controller Controller = new Controller();
 	
 	private static Sound startMenuMusic = new Sound("res/audio/start-menu.wav");
 	private static Sound inGameMusic = new Sound("res/audio/in-game-music.wav");
@@ -54,23 +55,31 @@ public class MainWindow {
 	private static boolean inBeginning = false;
 	private static boolean gameOver = false;
 	private static boolean gameWon = false;
-	private JLabel BackgroundImageForStartMenu;
+	private JLabel startMenu;
 	  
-	public MainWindow() {
-		frame.setSize(1024, 1072);
+	private static BufferedImage LoadImage(String imageName) throws IOException
+	{
+		File image = new File("res/" + imageName);
+		BufferedImage bufferedImage = ImageIO.read(image);
+		return bufferedImage;
+	}
+	public MainWindow() throws IOException {
 	    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-	    frame.setLayout(null);
-	    frame.add(canvas);  
+	    frame.setLayout(null); 
+	    
 	    canvas.setBounds(0, 0, 1024, 1024); 
 		canvas.setBackground(new Color(255,255,255));
 		canvas.setVisible(false);   // this will become visible after you press the key. 
-		          
+		frame.add(canvas);
+		
 	    JButton startMenuButton = new JButton("Start Game");  // start button 
+	    startMenuButton.setBounds(369, 735, 284, 58); 
+	    frame.add(startMenuButton);  
 	    startMenuButton.addActionListener(new ActionListener() { 
 	    	@Override
 			public void actionPerformed(ActionEvent e) { 
 	    		startMenuButton.setVisible(false);
-				BackgroundImageForStartMenu.setVisible(false); 
+	    		startMenu.setVisible(false); 
 				canvas.setVisible(true); 
 				canvas.addKeyListener(Controller);    //adding the controller to the Canvas  
 				canvas.addMouseListener(Controller);
@@ -80,58 +89,39 @@ public class MainWindow {
 				startMenuMusic.stop();
 			}
 	    });  
-	    startMenuButton.setBounds(369, 735, 284, 58); 
-	        
-        //loading background image 
-        File BackroundToLoad = new File("res/startscreen.png");
-		try {
-			BufferedImage myPicture = ImageIO.read(BackroundToLoad);
-			BackgroundImageForStartMenu = new JLabel(new ImageIcon(myPicture));
-			BackgroundImageForStartMenu.setBounds(0, 0, 1024, 1024);
-			frame.add(BackgroundImageForStartMenu); 
-		} catch (IOException e) { 
-			e.printStackTrace();
-		}   
-		 
-        frame.add(startMenuButton);  
+        
+		BufferedImage image = LoadImage("startscreen.png");
+		startMenu = new JLabel(new ImageIcon(image));
+		startMenu.setBounds(0, 0, image.getWidth(), image.getHeight());
+		frame.add(startMenu); 
+		
+        frame.setSize(1024, 1050);
+        frame.setResizable(false);
         frame.setVisible(true);  
 	}
 
 	public static void main(String[] args) {
-		MainWindow hello = new MainWindow();  //sets up environment 
-		startMenuMusic.loop();
-		play();
-		
-		if(gameOver) {
-			inGameMusic.stop();
-			gameOverMusic.loop();
-			File BackroundToLoad = new File("res/gameoverscreen.png");
-			try {
-				BufferedImage myPicture = ImageIO.read(BackroundToLoad);
-				JLabel gameOverScreen = new JLabel(new ImageIcon(myPicture));
-				gameOverScreen.setBounds(0, 0, 1024, 1024);
-				frame.add(gameOverScreen); 
-				canvas.setVisible(false);
-				gameOverScreen.setVisible(true);
-			} catch (IOException e) { 
-				e.printStackTrace();
+		try {
+			new MainWindow();  //sets up environment 
+			startMenuMusic.loop();
+			play();
+			
+			if(gameOver || gameWon) {
+				inGameMusic.stop();
+				if (gameOver)
+					gameOverMusic.loop();
+				else
+					gameWonMusic.loop();
+	
+					BufferedImage myPicture = LoadImage(gameOver ? "gameoverscreen.png" : "gamewonscreen.png");
+					JLabel endScreen = new JLabel(new ImageIcon(myPicture));
+					endScreen.setBounds(0, 0, 1024, 1024);
+					frame.add(endScreen); 
+					canvas.setVisible(false);
+					endScreen.setVisible(true);		
 			}
-		}
-		
-		else if(gameWon) {
-			inGameMusic.stop();
-			gameWonMusic.loop();
-			File BackroundToLoad = new File("res/gamewonscreen.png");
-			try {
-				BufferedImage myPicture = ImageIO.read(BackroundToLoad);
-				JLabel gameWonScreen = new JLabel(new ImageIcon(myPicture));
-				gameWonScreen.setBounds(0, 0, 1024, 1024);
-				frame.add(gameWonScreen); 
-				canvas.setVisible(false);
-				gameWonScreen.setVisible(true);
-			} catch (IOException e) { 
-				e.printStackTrace();
-			}
+		} catch (IOException e) { 
+			e.printStackTrace();
 		}
 	} 
 	
@@ -149,16 +139,25 @@ public class MainWindow {
 				ImageIcon icon = new ImageIcon("res/hoodedfigure.png");
 				int chosenCharacter = -1;
 				while(chosenCharacter == -1) {	
-					chosenCharacter = JOptionPane.showOptionDialog(frame, "Please choose a player:", "Who are you?", JOptionPane.DEFAULT_OPTION, 
-																   JOptionPane.PLAIN_MESSAGE, icon, characters, characters[0]);
+					chosenCharacter = JOptionPane.showOptionDialog( frame, 
+																	"Please choose a player:", 
+																	"Who are you?", 
+																	JOptionPane.DEFAULT_OPTION, 
+																	JOptionPane.PLAIN_MESSAGE, 
+																	icon, 
+																	characters, 
+																	characters[0]);
 				}
 				gameworld.selectPlayer(chosenCharacter);
 				JOptionPane.showMessageDialog(frame, "You need to escape. It's dangerous.");
 				JOptionPane.showMessageDialog(frame, "Find the key and get out of here.");
 				inGameMusic.loop();
 				JLabel lbl = new JLabel(new ImageIcon(("res/controlhelp.png")));
-			    JOptionPane.showMessageDialog(frame, lbl, "Controls", 
-			                                 JOptionPane.PLAIN_MESSAGE, null);
+			    JOptionPane.showMessageDialog(	frame, 
+			    								lbl, 
+			    								"Controls", 
+			    								JOptionPane.PLAIN_MESSAGE, 
+			    								null);
 				inBeginning = false;
 			}
 			
@@ -167,29 +166,35 @@ public class MainWindow {
 			
 			//Check if game over
 			if(gameworld.getHealth() == 0) {
-				System.out.println("Game over");
 				gameOver = true;
 			}
 			
 			//Check if opened chest without a key
 			if(gameworld.getCheckedChestWithoutKey()) {
-				JOptionPane.showMessageDialog(frame, "The key doesn't seem to be here...");
+				JOptionPane.showMessageDialog(	frame, 
+												"The key doesn't seem to be here...");
 			}
 			
 			//Check if opened chest with key
 			if(gameworld.getCheckedChestWithKey()) {
 				ImageIcon icon = new ImageIcon("res/key.png");
-				JOptionPane.showMessageDialog(frame, "You found the key!", "Key found!", JOptionPane.PLAIN_MESSAGE, icon);
+				JOptionPane.showMessageDialog(	frame, 
+												"You found the key!", 
+												"Key found!", 
+												JOptionPane.PLAIN_MESSAGE, 
+												icon);
 			}
 			
 			//Check if tried to open door with no key
 			if(gameworld.getCheckedDoor() && !gameworld.getPlayer().getHasKey()) {
-				JOptionPane.showMessageDialog(frame, "You can't open the door... Look for the key.");
+				JOptionPane.showMessageDialog(	frame, 
+												"You can't open the door... Look for the key.");
 			}
 			
 			//Check if opened door with key
 			if(gameworld.getCheckedDoor() && gameworld.getPlayer().getHasKey()) {
-				JOptionPane.showMessageDialog(frame, "You unlocked the door!");
+				JOptionPane.showMessageDialog(	frame, 
+												"You unlocked the door!");
 				gameWon = true;
 			}  
 		}
