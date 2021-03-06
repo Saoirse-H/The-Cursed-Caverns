@@ -63,6 +63,7 @@ public class MainWindow {
 		BufferedImage bufferedImage = ImageIO.read(image);
 		return bufferedImage;
 	}
+	
 	public MainWindow() throws IOException {
 	    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	    frame.setLayout(null); 
